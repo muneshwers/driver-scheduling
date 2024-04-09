@@ -1,3 +1,42 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
 }
+
+.contentContainer{
+    display: flex;
+}
+
+.calendarContainer {
+    padding: 10px;
+    height: 70vh;
+    width: 70%;
+}
+
+.formContainer{
+    padding: 10px;
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+}
+
+.formContainer > input {
+    margin-bottom: 5%;
+    padding: 10px;
+    outline: none;
+    border-radius: 10px;
+    border-color: #0047ab;
+}
+
+.submit-button {
+    border: 0;
+    padding: 10px;
+    background-color: #0047ab;
+    color: white;
+    border-radius: 10px;
+}
+
+.submit-button:hover {
+    cursor: pointer;
+    background-color: #003580;
+    transition: 0.5s;
+}
