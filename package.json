@@ -29,6 +29,7 @@
 		"@fullcalendar/core": "^6.1.11",
 		"@fullcalendar/resource": "^6.1.11",
 		"@fullcalendar/resource-timegrid": "^6.1.11",
+		"@fullcalendar/resource-timeline": "^6.1.11",
 		"fullcalendar": "^6.1.11"
 	}
 }
