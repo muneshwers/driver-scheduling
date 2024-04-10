@@ -7,21 +7,27 @@
 
     const validateLogin = (event) => {
         let userLogin = users.find((user) => user.username == username);
-        if (!userLogin) return;
+        if (userLogin == undefined) return console.log("Error: User not found.");
+        console.log("Login Successful");
     }
 </script>
-
+<svelte:head>
+	<title>Sign In - Driver Scheduling</title>
+	<meta name="description" content="Muneshwers Driver Scheduling Platform" />
+</svelte:head>
 <div class="signin-page">
     <div class="container">
         <div class="title">
             <h1>Muneshwers Driver Schedule</h1>
         </div>
-        <form action="">
-            <input type="text" placeholder="Username" bind:value={username}/>
-            <input type="password" placeholder="Password" bind:value={password}/>
+        <form action="POST">
+            <input type="text" placeholder="Username" bind:value={username} name="username"/>
+            <input type="password" placeholder="Password" bind:value={password} name="password"/>
             <span>{username}</span>
             <button type="submit" class="signin-submit" on:click={() => validateLogin()}>Sign In</button>
         </form>
+        <br />
+        <a href="/">Back to Home</a>
     </div>
     
 </div>
