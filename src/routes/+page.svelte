@@ -36,8 +36,10 @@
             end: dateInput+"T"+toInput+":00",
             resourceId: driverInput
         }
+        calendar.addEvent(eventDetails);
         eventData.push(eventDetails);
         eventData = eventData;
+        calendar.refetchEvents();
         console.log("Schedule updated!", eventDetails, ". Events are now: ", eventData);
     }
 
