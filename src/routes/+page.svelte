@@ -1,14 +1,15 @@
 <script>
-    import Header from "./Header.svelte";
     import { onMount } from 'svelte';
     import { Calendar } from "@fullcalendar/core";
     import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
     import './styles.css';
 
     let calendarEl;
+    let isLoggedIn = true;
+    let calendar;
 
     onMount(() => {
-        let calendar = new Calendar(calendarEl, {
+        calendar = new Calendar(calendarEl, {
             plugins: [ resourceTimelinePlugin ],
             initialView: 'resourceTimeline',
             buttonText: {
@@ -55,19 +56,37 @@
 	<meta name="description" content="Muneshwers Driver Scheduling Platform" />
 </svelte:head>
 
-<Header />
+<header>
+    <div class="title">
+        <h1>Muneshwers Drivers Schedule</h1>
+    </div>
+    <div class="actions">
+        <a href="/signin">
+            <button type="button" class="signin-button">
+                {isLoggedIn ? 'Sign Out' : 'Sign In'}
+            </button>
+        </a>
+    </div>
+</header>
+
 <div class="contentContainer">
-    <div class="calendarContainer">
+    <div class:calendarContainer={isLoggedIn} class:calendarReadOnlyContainer={!isLoggedIn}>
         <div bind:this={calendarEl}></div>
     </div>
 
-    <form action="POST" class="formContainer">
-        <h1>Schedule Driver</h1>
-        <input type="text" placeholder="Driver Name" />
-        <input type="text" placeholder="From" />
-        <input type="text" placeholder="To" />
-        <input type="date" placeholder="Date" />
-        <button type="submit" class="submit-button">Schedule</button>
-    </form>
+    {#if isLoggedIn}
+        <form action="POST" class="formContainer">
+            <h1>Schedule Driver</h1>
+            <select name="drivers">
+                <option value="Select Driver">Select Driver:</option>
+                <option value="Johnson Daniels">Johnson Daniels</option>
+                <option value="Christian Murray">Christian Murray</option>
+            </select>
+            <input type="time" placeholder="From" />
+            <input type="time" placeholder="To" />
+            <input type="date" placeholder="Date" />
+            <button type="submit" class="submit-button">Schedule</button>
+        </form>
+    {/if}
 </div>
 
