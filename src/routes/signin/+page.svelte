@@ -1,6 +1,14 @@
 <script>
     import '../styles.css';
-    let isLoggedIn;
+    import { users } from '../data';
+
+    $: username = '';
+    $: password = '';
+
+    const validateLogin = (event) => {
+        let userLogin = users.find((user) => user.username == username);
+        if (!userLogin) return;
+    }
 </script>
 
 <div class="signin-page">
@@ -8,10 +16,11 @@
         <div class="title">
             <h1>Muneshwers Driver Schedule</h1>
         </div>
-        <form action="POST">
-            <input type="text" placeholder="Username" />
-            <input type="password" placeholder="Password" />
-            <button type="submit" class="signin-submit">Sign In</button>
+        <form action="">
+            <input type="text" placeholder="Username" bind:value={username}/>
+            <input type="password" placeholder="Password" bind:value={password}/>
+            <span>{username}</span>
+            <button type="submit" class="signin-submit" on:click={() => validateLogin()}>Sign In</button>
         </form>
     </div>
     
