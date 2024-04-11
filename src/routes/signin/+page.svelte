@@ -8,6 +8,7 @@
     const validateLogin = (event) => {
         let userLogin = users.find((user) => user.username == username);
         if (userLogin == undefined) return console.log("Error: User not found.");
+        if (userLogin.password !== password) return console.log("Incorrect Password");
         console.log("Login Successful");
     }
 </script>
@@ -20,7 +21,7 @@
         <div class="title">
             <h1>Muneshwers Driver Schedule</h1>
         </div>
-        <form action="POST">
+        <form method="post">
             <input type="text" placeholder="Username" bind:value={username} name="username"/>
             <input type="password" placeholder="Password" bind:value={password} name="password"/>
             <span>{username}</span>
