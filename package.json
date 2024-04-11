@@ -30,6 +30,7 @@
 		"@fullcalendar/resource": "^6.1.11",
 		"@fullcalendar/resource-timegrid": "^6.1.11",
 		"@fullcalendar/resource-timeline": "^6.1.11",
+		"@supabase/supabase-js": "^2.42.1",
 		"fullcalendar": "^6.1.11"
 	}
 }
