@@ -1,15 +1,21 @@
 <script>
     import { onMount } from 'svelte';
+    import { page } from '$app/stores';
     import { Calendar } from "@fullcalendar/core";
     import { drivers, events } from "./data";
     import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
     import './styles.css';
-
+    
     let calendarEl;
-    let isLoggedIn = true;
     let calendar;
     let eventData = events;
+    let isLoggedIn = false;
 
+    const url = new URL($page.url);
+    const searchParams = url.searchParams;
+    isLoggedIn = searchParams.get('isLoggedIn');
+
+    
     $: driverInput = '';
     $: fromInput = '';
     $: toInput = '';
