@@ -5,12 +5,12 @@
     $: username = '';
     $: password = '';
 
-    const validateLogin = (event) => {
-        let userLogin = users.find((user) => user.username == username);
-        if (userLogin == undefined) return console.log("Error: User not found.");
-        if (userLogin.password !== password) return console.log("Incorrect Password");
-        console.log("Login Successful");
-    }
+    // const validateLogin = (event) => {
+    //     let userLogin = users.find((user) => user.username == username);
+    //     if (userLogin == undefined) return console.log("Error: User not found.");
+    //     if (userLogin.password !== password) return console.log("Incorrect Password");
+    //     console.log("Login Successful");
+    // }
 </script>
 <svelte:head>
 	<title>Sign In - Driver Scheduling</title>
@@ -24,8 +24,7 @@
         <form method="post">
             <input type="text" placeholder="Username" bind:value={username} name="username"/>
             <input type="password" placeholder="Password" bind:value={password} name="password"/>
-            <span>{username}</span>
-            <button type="submit" class="signin-submit" on:click={() => validateLogin()}>Sign In</button>
+            <button type="submit" class="signin-submit" >Sign In</button>
         </form>
         <br />
         <a href="/">Back to Home</a>
