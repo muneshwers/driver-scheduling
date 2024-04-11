@@ -1,4 +1,6 @@
 import { users } from '../data.js';
+import { redirect } from '@sveltejs/kit';
+
 
 export const actions = {
     default: async ({request}) => {
@@ -9,7 +11,10 @@ export const actions = {
         let userLogin = users.find((user) => user.username == username);
 
         if (userLogin.username == username && userLogin.password == password) {
-            document.write("Sign in Success");
+            console.log("Login Successful");
+            const data = { isLoggedIn: true };
+            redirect(303, `/?isLoggedIn=${data.isLoggedIn}`);
+            
         }
     }
 }
