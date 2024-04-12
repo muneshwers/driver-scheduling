@@ -2,13 +2,14 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
     import { Calendar } from "@fullcalendar/core";
-    import { drivers, events } from "./data";
+    import { supabase } from "$lib/supabaseClient";
     import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
     import './styles.css';
+
+    export let data;
     
     let calendarEl;
     let calendar;
-    let eventData = events;
     let isLoggedIn = false;
 
     const url = new URL($page.url);
@@ -29,8 +30,8 @@
                 today: 'Today' // Change the text for the "Today" button here
             },
             height: "100%",
-            resources: drivers,
-            events: eventData
+            resources: data.driverList,
+            events: data.eventsList
         })
         calendar.render();
     });
@@ -43,10 +44,19 @@
             resourceId: driverInput
         }
         calendar.addEvent(eventDetails);
-        eventData.push(eventDetails);
-        eventData = eventData;
+        updateEvents(eventDetails);
         calendar.refetchEvents();
-        console.log("Schedule updated!", eventDetails, ". Events are now: ", eventData);
+        console.log("Schedule updated!", eventDetails, ". Events are now: ", data.eventsList);
+    }
+
+    const updateEvents = async(eventDetails) => {
+        const { error } = await supabase.from("events").insert([eventDetails]);
+        if (error) return console.log("Unable to Insert: ", error);
+        console.log("Insert successful!");
+        driverInput = '';
+        fromInput = '';
+        toInput='';
+        dateInput='';
     }
 
     
@@ -81,16 +91,20 @@
             <h1>Schedule Driver</h1>
             <select name="drivers" bind:value={driverInput}>
                 <option value="Select Driver">Select Driver:</option>
-                <option value="1">Johnson Barrymore</option>
-                <option value="2">Christian Murray</option>
-                <option value="3">Izuku Midoriya</option>
-                <option value="4">Brad English</option>
+                {#each data.drivers as driver}
+                    <option value={driver.id}>{driver.name}</option>
+                {/each}
             </select>
             <input type="time" placeholder="From" bind:value={fromInput}/>
             <input type="time" placeholder="To" bind:value={toInput}/>
             <input type="date" placeholder="Date" bind:value={dateInput}/>
             <button type="submit" class="submit-button" on:click={() => handleSubmit()}>Schedule</button>
             <span>{driverInput} from {fromInput} to {toInput} on {dateInput}.</span>
+            <!-- <ul>
+                {#each data.users as user}
+                    <li>{user.name}</li>
+                {/each}
+            </ul> -->
         </form>
     {/if}
 </div>
