@@ -42,11 +42,29 @@
             start: dateInput+"T"+fromInput+":00",
             end: dateInput+"T"+toInput+":00",
             resourceId: driverInput
-        }
+        };
+        //For upload and validation
+        let eventUpload = {
+            ...eventDetails,
+            date: dateInput,
+            startTime: fromInput+":00",
+            endTime: toInput+":00"
+        } 
+        let overlaps = checkforOverlaps(eventUpload);
+        console.log("Entry Overlaps?: ",overlaps);
+        if(overlaps) return console.log("Driver is already scheduled for this time and date. Please choose another period.")
         calendar.addEvent(eventDetails);
-        updateEvents(eventDetails);
+        updateEvents(eventUpload);
         calendar.refetchEvents();
-        console.log("Schedule updated!", eventDetails, ". Events are now: ", data.eventsList);
+    }
+
+    const checkforOverlaps = (eventUpload) => {
+        let eventsList = data.eventsAllCols;
+        let driverEvents = eventsList.filter((driverEvent) => driverEvent.resourceId == eventUpload.resourceId && driverEvent.date == eventUpload.date);
+        let foundOverlap = driverEvents.find((singleEvent) => (eventUpload.startTime >= singleEvent.startTime && eventUpload.startTime < singleEvent.endTime) || (eventUpload.endTime > singleEvent.startTime && eventUpload.endTime <= singleEvent.endTime));
+        if(!foundOverlap) return false; //No overlaps or duplicates
+        return true;
+
     }
 
     const updateEvents = async(eventDetails) => {
