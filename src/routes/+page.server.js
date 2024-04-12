@@ -14,6 +14,7 @@ import { supabase } from "$lib/supabaseClient";
         end: singleEvent.end,
         resourceId: singleEvent.resourceId
       })),
+      eventsAllCols: events ?? [],
       driverList: drivers.map((driver) => ({
         id: driver.id,
         title: driver.name
