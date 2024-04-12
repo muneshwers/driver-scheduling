@@ -1,16 +1,9 @@
 <script>
     import '../styles.css';
-    import { users } from '../data';
 
     $: username = '';
     $: password = '';
 
-    // const validateLogin = (event) => {
-    //     let userLogin = users.find((user) => user.username == username);
-    //     if (userLogin == undefined) return console.log("Error: User not found.");
-    //     if (userLogin.password !== password) return console.log("Incorrect Password");
-    //     console.log("Login Successful");
-    // }
 </script>
 <svelte:head>
 	<title>Sign In - Driver Scheduling</title>
