@@ -91,7 +91,7 @@
         <h1>Muneshwers Drivers Schedule</h1>
     </div>
     <div class="actions">
-        <a href="/signin">
+        <a href={'/signin'}>
             <button type="button" class="signin-button">
                 {isLoggedIn ? 'Sign Out' : 'Sign In'}
             </button>
@@ -117,12 +117,6 @@
             <input type="time" placeholder="To" bind:value={toInput}/>
             <input type="date" placeholder="Date" bind:value={dateInput}/>
             <button type="submit" class="submit-button" on:click={() => handleSubmit()}>Schedule</button>
-            <span>{driverInput} from {fromInput} to {toInput} on {dateInput}.</span>
-            <!-- <ul>
-                {#each data.users as user}
-                    <li>{user.name}</li>
-                {/each}
-            </ul> -->
         </form>
     {/if}
 </div>
