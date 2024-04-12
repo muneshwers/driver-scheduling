@@ -104,12 +104,13 @@ select:hover, select:focus {
 }
 
 .signin-submit {
+    font-size: medium;
     border: 0;
     padding: 10px;
     background-color: #0047ab;
     color: white;
     border-radius: 10px;
-    width: 50%;
+    width: 40%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -123,8 +124,9 @@ select:hover, select:focus {
 .fc-event{
     background-color: #14830c !important;
     border: 0;
-    padding: 5px;
+    padding: 8px;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 /*fc-event fc-event-start fc-event-end fc-event-past fc-event-today fc-timeline-event fc-h-event*/
