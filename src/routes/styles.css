@@ -119,3 +119,12 @@ select:hover, select:focus {
     background-color: #003580;
     transition: 0.5s;
 }
+
+.fc-event{
+    background-color: #14830c !important;
+    border: 0;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/*fc-event fc-event-start fc-event-end fc-event-past fc-event-today fc-timeline-event fc-h-event*/
