@@ -20,7 +20,10 @@
             <button type="submit" class="signin-submit" >Sign In</button>
         </form>
         <br />
-        <a href="/">Back to Home</a>
+        <div class="backTohome">
+            <a href="/">Back to Home</a>
+        </div>
+        
     </div>
     
 </div>
@@ -40,4 +43,20 @@
     input:hover, input:focus {
         border: 1px #0047ab solid;
     }
+
+    a{
+        text-decoration: none;
+        color: black;
+    }
+    
+    a:hover {
+        color: #0047ab;
+        transition: 0.5s;
+        text-decoration: underline;
+    }
+
+    .backTohome{
+        padding: 10px;
+    }
+
 </style>
