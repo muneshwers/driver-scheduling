@@ -129,4 +129,7 @@ select:hover, select:focus {
     cursor: pointer;
 }
 
+input[type="date"]::-webkit-datetime-edit {
+    text-transform: uppercase;
+}
 /*fc-event fc-event-start fc-event-end fc-event-past fc-event-today fc-timeline-event fc-h-event*/
