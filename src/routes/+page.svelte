@@ -73,6 +73,10 @@
         const { error } = await supabase.from("events").insert([eventDetails]);
         if (error) return console.log("Unable to Insert: ", error);
         console.log("Insert successful!");
+        formRefresh();
+    }
+
+    const formRefresh = () => {
         driverInput = '';
         fromInput = '';
         toInput='';
