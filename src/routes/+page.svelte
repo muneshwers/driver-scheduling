@@ -25,11 +25,13 @@
     onMount(() => {
         calendar = new Calendar(calendarEl, {
             plugins: [ resourceTimelinePlugin ],
+            slotDuration: '00:10:00',
             initialView: 'resourceTimeline',
             buttonText: {
                 today: 'Today' // Change the text for the "Today" button here
             },
             height: "100%",
+            schedulerLicenseKey: '0970091250-fcs-1710098081',
             resources: data.driverList,
             events: data.eventsList
         })
@@ -116,7 +118,7 @@
             <input type="time" placeholder="From" bind:value={fromInput}/>
             <input type="time" placeholder="To" bind:value={toInput}/>
             <input type="date" placeholder="Date" bind:value={dateInput}/>
-            <button type="submit" class="submit-button" on:click={() => handleSubmit()}>Schedule</button>
+            <button type="button" class="submit-button" on:click={() => handleSubmit()}>Schedule</button>
         </form>
     {/if}
 </div>
