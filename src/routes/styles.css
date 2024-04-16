@@ -1,3 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+.roboto-thin {
+    font-family: "Roboto", sans-serif;
+    font-weight: 100;
+    font-style: normal;
+}
+
+.roboto-light {
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.roboto-regular {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.roboto-medium {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.roboto-bold {
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.roboto-black {
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+    font-style: normal;
+}
+
+.roboto-thin-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 100;
+    font-style: italic;
+}
+
+.roboto-light-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.roboto-regular-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.roboto-medium-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.roboto-bold-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.roboto-black-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+}
+
 body, .signin-page {
     font-family: Arial, Helvetica, sans-serif;
 }
@@ -6,8 +80,9 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 20px;
     font-weight: bold;
+    margin-bottom: 2%;
 }
 
 .signin-button {
@@ -42,28 +117,59 @@ header {
 }
 
 .formContainer{
-    padding: 10px;
-    width: 30%;
     display: flex;
     flex-direction: column;
 }
 
-.formContainer > input {
+.workspace {
+    border-radius: 10px;
+    width: 30%;
+    padding: 20px;
+}
+
+.preview-mode {
+    border: 2px rgba(3, 20, 255, 0.5) solid;
+}
+
+.edit-mode {
+    border: 2px rgba(217, 255, 3, 0.5) solid;
+}
+
+.default-mode {
+    border: 2px rgb(119, 119, 119, 0.5) solid;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     margin-bottom: 5%;
+}
+
+/* .workspace > .formContainer > .row > input {
     padding: 10px;
     outline: none;
+    width: 318px;
+    border-radius: 10px;
+    border: 2px rgb(187, 187, 187) solid;
+} */
+
+.workspace-input {
+    padding: 10px;
+    outline: none;
+    width: 318px;
     border-radius: 10px;
     border: 2px rgb(187, 187, 187) solid;
 }
 
-.formContainer > input:hover, input:focus {
+.workspace-input:hover, .workspace-input:focus {
     border: 2px #0047ab solid;
 }
 
 select {
-    margin-bottom: 5%;
     padding: 10px;
     outline: none;
+    width: 318px;
     border: 2px rgb(187, 187, 187) solid;
     border-radius: 10px;
 }
@@ -71,6 +177,23 @@ select {
 select:hover, select:focus {
     border: 2px #0047ab solid;
 }
+
+.workspace > .formContainer > .row > label {
+    width: 25%;
+    color: rgb(89, 89, 89);
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.workspace>.preview-container>.row>label {
+    width: 25%;
+    color: rgb(89, 89, 89);
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
 
 .submit-button {
     border: 0;
@@ -137,4 +260,59 @@ input[type="date"]::-webkit-datetime-edit {
     border-radius: 10px;
     padding: 5px;
 }
+
+.title-text {
+    font-size: 30px;
+}
 /*fc-event fc-event-start fc-event-end fc-event-past fc-event-today fc-timeline-event fc-h-event*/
+
+.preview-container {
+    margin-top: 8%;
+    margin-bottom: 8%;
+}
+.previewLabel {
+    width: 25%;
+    color: rgb(89, 89, 89);
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+.previewContent {
+    margin-left: 2%;
+}
+
+.btn-edit, .btn-delete {
+    padding: 10px;
+    width: 20%;
+    font-size: medium;
+    border-radius: 10px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.btn-edit {
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+}
+
+.btn-edit:hover {
+    color: white;
+    background-color:#0047ab;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.btn-delete {
+    border: 2px #ab0000 solid;
+    color: #ab0000;
+    background-color: #ffd0d0;
+}
+
+.btn-delete:hover {
+    color: white;
+    background-color: #ab0000;
+    transition: 0.2s;
+    cursor: pointer;
+}
