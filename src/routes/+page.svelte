@@ -7,6 +7,25 @@
     import './styles.css';
 
     export let data;
+
+    const changes = supabase.channel('table-db-changes').on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public', 
+          table: 'events',
+        },
+        (payload) => console.log(payload)
+      ).on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'events',
+        },
+        (payload) => console.log(payload)
+      )
+      .subscribe();
     
     let calendarEl;
     let calendar;
@@ -25,6 +44,8 @@
 
     //Toggles
     $: formField = 'create'; //Options: create, editing, preview
+    $: eventsForCalendar = data.eventsList;
+    $: eventsAllCols = data.eventsAllCols;
     $: resourceId = '';
     $: eventStart = '';
     $: eventEnd = '';
@@ -44,7 +65,7 @@
             height: "100%",
             schedulerLicenseKey: '0970091250-fcs-1710098081',
             resources: data.driverList,
-            events: data.eventsList,
+            events: eventsForCalendar,
             eventClick : (info) => {
                 formField = 'preview'
                 pageVariableRefresh(); //Refreshes all reactive variables
@@ -72,7 +93,7 @@
             }
         });
         document.addEventListener('click', function(event) {
-            if (!event.target.closest('.fc-event') && !event.target.closest('.workspace') && !event.target.closest('.btn-edit')) {
+            if (!event.target.closest('.fc-event') && !event.target.closest('.workspace') && !event.target.closest('.btn-edit') && !event.target.closest('.btn-delete')) {
                 formField = 'create';
                 pageVariableRefresh();
             }
@@ -96,7 +117,8 @@
         } 
         let overlaps = checkforOverlaps(eventUpload);
         console.log("Entry Overlaps?: ",overlaps);
-        if(overlaps) return console.log("Driver is already scheduled for this time and date. Please choose another period.")
+        if(overlaps) return console.log("Driver is already scheduled for this time and date. Please choose another period.");
+        if(fromInput >= toInput) return console.log("Incorrect input. To date is before From date.");
         calendar.addEvent(eventDetails);
         updateEvents(eventUpload);
         calendar.refetchEvents();
@@ -123,6 +145,7 @@
         if(overlaps) return console.log("Driver is already scheduled for this time and date. Please choose another period.")
         // calendar.addEvent(eventDetails);
         editEvent(eventUpload);
+        formField = 'create';
         calendar.refetchEvents();
     }
 
@@ -135,7 +158,7 @@
 
 
     const checkforOverlaps = (eventUpload) => {
-        let eventsList = data.eventsAllCols;
+        let eventsList = eventsAllCols;
         let driverEvents = eventsList.filter((driverEvent) => driverEvent.resourceId == eventUpload.resourceId && driverEvent.date == eventUpload.date);
         let foundOverlap = driverEvents.find((singleEvent) => (eventUpload.startTime >= singleEvent.startTime && eventUpload.startTime < singleEvent.endTime) || (eventUpload.endTime > singleEvent.startTime && eventUpload.endTime <= singleEvent.endTime));
         if(!foundOverlap) return false; //No overlaps or duplicates
@@ -144,7 +167,7 @@
     }
 
     const checkforOverlapsEdit = (eventUpload) => {
-        let eventsList = data.eventsAllCols;
+        let eventsList = eventsAllCols;
         let driverEvents = eventsList.filter((driverEvent) => driverEvent.resourceId == eventUpload.resourceId && driverEvent.date == eventUpload.date && driverEvent.id !== eventUpload.editID);
         let foundOverlap = driverEvents.find((singleEvent) => (eventUpload.startTime >= singleEvent.startTime && eventUpload.startTime < singleEvent.endTime) || (eventUpload.endTime > singleEvent.startTime && eventUpload.endTime <= singleEvent.endTime));
         if(!foundOverlap) return false; //No overlaps or duplicates
@@ -172,13 +195,14 @@
          .eq('id', eventDetails.editID)
          if (error) return console.log("Unable to edit: ", error);
          formRefresh();
+         refreshEvents();
     }
 
     const formRefresh = () => {
         driverInput = '';
         fromInput = '';
         toInput='';
-        dateInput='';
+        dateInput=(new Date()).toISOString().split('T')[0];
         description='';
     }
 
@@ -186,7 +210,7 @@
         driverInput = '';
         fromInput = '';
         toInput='';
-        dateInput='';
+        dateInput=(new Date()).toISOString().split('T')[0];
         description='';
         resourceId = '';
         eventStart = '';
@@ -195,9 +219,18 @@
         driverName = '';
     }
 
+    const refreshEvents = () => {
+        // Update event data (fetch from API or update existing data)
+        let events = data.eventsList;
+
+        // Re-render FullCalendar with updated event data
+        calendar.removeAllEventSources();
+        calendar.addEventSource(events);
+    }
+
 
     const getEventDetailsById = (concatEvent) => {
-        const concatFromDb = data.eventsAllCols.map((singleEvent) => ({
+        const concatFromDb = eventsAllCols.map((singleEvent) => ({
             id: singleEvent.id,
             uniqueId: singleEvent.title+singleEvent.start+singleEvent.end+singleEvent.resourceId
         }));
@@ -205,7 +238,7 @@
         const foundEvent = concatFromDb.find((data) => data.uniqueId == concatEvent);
 
         if(!foundEvent) return console.log("Event Id not found. Please check data.");
-        const returnedEvent = data.eventsAllCols.find((data) => data.id == foundEvent.id);
+        const returnedEvent = eventsAllCols.find((data) => data.id == foundEvent.id);
         console.log(returnedEvent);
         return returnedEvent;
 
@@ -244,8 +277,8 @@
         <div bind:this={calendarEl}></div>
     </div>
 
-    {#if isLoggedIn}
-        <div class="workspace {formField == "preview" ? 'preview-mode':'default-mode'}">
+    {#if isLoggedIn} <!-- delete-mode -->
+        <div class="workspace {formField == "preview" ? 'preview-mode': formField == "editing" ? 'edit-mode' : formField == "deletion" ? 'delete-mode' : 'default-mode'}">
             {#if formField == "create"}
                 <form action="" class="formContainer">
                     <h1 class="roboto-medium">Schedule Driver</h1>
@@ -274,7 +307,7 @@
                         <label for="date">Date</label>
                         <input type="date" placeholder="Date" bind:value={dateInput} id="date" class="workspace-input"/>
                     </div>
-                    <button type="button" class="submit-button" on:click={() => handleSubmit()}>Schedule</button>
+                    <button type="button" class="btn-submit" on:click={() => handleSubmit()}>Schedule</button>
                 </form>
             {:else if formField == "preview"}
                 <h1 class="roboto-medium">Driver Event { eventIDEdit } Preview </h1>
@@ -322,7 +355,16 @@
                 </div>
                 <div class="actions">
                     <button type="button" class="btn-edit" on:click={() => formField = 'editing'}>Edit</button>
-                    <button type="button" class="btn-delete" on:click={() => handleDeletion()}>Delete</button>
+                    <button type="button" class="btn-delete" on:click={() => formField = 'deletion'}>Delete</button>
+                </div>
+            {:else if formField == "deletion"}
+                <h1 class="roboto-medium">Driver Event { eventIDEdit } Preview </h1>
+                <div class="preview-container">
+                    Are you sure?
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn-delete" on:click={() => handleDeletion()}>Yes</button>
+                    <button type="button" class="btn-edit" on:click={() => formField = 'preview'}>No</button>
                 </div>
             {:else if formField == "editing"}
                 <h1 class="roboto-medium">Driver Event { eventIDEdit } Edit</h1>
@@ -362,7 +404,7 @@
 
                 </div>
                 <div class="preview-actions">
-                    <button type="button" class="btn-edit" on:click={() => handleEdit()}>Update</button>
+                    <button type="button" class="btn-update" on:click={() => handleEdit()}>Update</button>
                 </div>
             {/if}
         </div>
