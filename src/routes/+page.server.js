@@ -1,5 +1,6 @@
 import { supabase } from "$lib/supabaseClient";
 
+
   export async function load() {
     const { data: drivers, error: driverError } = await supabase.from("drivers").select();
     const { data: events, error: eventError } = await supabase.from("events").select();
