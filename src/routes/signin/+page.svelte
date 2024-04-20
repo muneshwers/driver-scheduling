@@ -15,7 +15,7 @@
     //Toggles and Messages
     let errorToggle = false;
     let errorMessage = '';
-    let buttonToggle = true;
+    let disabled = true;
 
     if (errorSignin == "IncorrectCredentials") {
         errorToggle = true;
@@ -24,12 +24,12 @@
     }
 
     //Form input validation
-    const checkInputs = () => {
+    const buttonToggle = () => {
         if(!username || !password) {
-            buttonToggle = true;
+            disabled = true;
             return
         }
-        buttonToggle = false;
+        disabled = false;
     }
 </script>
 <svelte:head>
@@ -39,15 +39,15 @@
 <div class="signin-page">
     <div class="container">
         <div class="title">
-            <h1>Muneshwers Driver Schedule</h1>
+            <h1 class="roboto-medium">Muneshwers Driver Schedule</h1>
         </div>
         {#if errorToggle}
             <div class="error-message">{errorMessage}</div>
         {/if}
         <form method="post">
-            <input type="text" placeholder="Username" bind:value={username} name="username" class="signin-input {errorToggle == true ? 'input-error' : 'default-input'}" on:input={() => checkInputs()}/>
-            <input type="password" placeholder="Password" bind:value={password} name="password" class="signin-input {errorToggle == true ? 'input-error' : 'default-input'}" on:input={() => checkInputs()}/>
-            <button type="submit" class="signin-submit" disabled={buttonToggle}>Sign In</button>
+            <input type="text" placeholder="Username" bind:value={username} name="username" class="signin-input {errorToggle == true ? 'input-error' : 'default-input'}" on:input={() => buttonToggle()}/>
+            <input type="password" placeholder="Password" bind:value={password} name="password" class="signin-input {errorToggle == true ? 'input-error' : 'default-input'}" on:input={() => buttonToggle()}/>
+            <button type="submit" class="signin-submit" {disabled}>Sign In</button>
         </form>
         <br />
         <div class="backTohome">
