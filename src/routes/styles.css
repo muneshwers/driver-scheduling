@@ -87,8 +87,13 @@ header {
 
 .signin-button {
     padding: 10px;
+    width: 100px;
+    font-size: medium;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
     border-radius: 5px;
-    border: 0;
+    border: 2px #0047ab solid;
     background-color: #0047ab;
     color: white;
     font-size: medium;
@@ -96,8 +101,28 @@ header {
 
 .signin-button:hover {
     cursor: pointer;
-    background-color: #003580;
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
     transition: 0.5s;
+}
+
+.signin-input{
+    padding: 10px;
+    outline: none;
+    border-radius: 10px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5%;
+}
+
+.signin-input:hover, .signin-input:focus {
+    border: 2px #0047ab solid;
+}
+
+.default-input {
+    border: 2px rgba(82, 82, 82, 0.404) solid;
 }
 
 .contentContainer{
@@ -148,6 +173,27 @@ header {
         0, 0.1);
 }
 
+.remove-link-defaults {
+    text-decoration: none;
+    color: black;
+}
+
+.remove-link-defaults:hover{
+    color: #0047ab;
+    transition: 0.5s;
+    text-decoration: underline;
+} 
+
+.remove-link-defaults:visited {
+    color: #0047ab;
+    transition: 0.5s;
+    text-decoration: underline;
+}
+
+.backTohome {
+    padding: 10px;
+}
+
 .row {
     display: flex;
     flex-direction: row;
@@ -187,6 +233,20 @@ select:hover, select:focus {
     border: 2px #0047ab solid;
 }
 
+.input-error {
+    border: 2px #f51c1c solid;
+}
+
+.error-message{
+    padding: 10px;
+    margin-bottom: 5%;
+    color: #f51c1c;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+
+}
+
 .workspace > .formContainer > .row > label {
     width: 25%;
     color: rgb(89, 89, 89);
@@ -202,6 +262,8 @@ select:hover, select:focus {
     font-weight: 500;
     font-style: normal;
 }
+
+
 
 
 .submit-button {
@@ -223,7 +285,7 @@ select:hover, select:focus {
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     width: 400px;
-    height: 45vh;
+    height: 55vh;
     margin-top: 8%;
     margin-left: auto;
     margin-right: auto;
@@ -237,20 +299,38 @@ select:hover, select:focus {
 
 .signin-submit {
     font-size: medium;
-    border: 0;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    border: 2px #0047ab solid;
     padding: 10px;
     background-color: #0047ab;
     color: white;
     border-radius: 10px;
-    width: 40%;
+    width: 120px;
     margin-left: auto;
     margin-right: auto;
 }
 
+.signin-submit:disabled {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+}
+
+.signin-submit:disabled:hover {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+    cursor: not-allowed;
+}
+
 .signin-submit:hover {
     cursor: pointer;
-    background-color: #003580;
-    transition: 0.5s;
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+    transition: 0.2s;
 }
 
 .fc-event{
@@ -292,7 +372,7 @@ input[type="date"]::-webkit-datetime-edit {
 
 .btn-edit, .btn-delete, .btn-update, .btn-submit {
     padding: 10px;
-    width: 20%;
+    width: 100px;
     font-size: medium;
     border-radius: 10px;
     font-family: "Roboto", sans-serif;
