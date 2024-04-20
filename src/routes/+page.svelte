@@ -119,7 +119,23 @@
     $: eventIDEdit = '';
 
     $: errors = {
-        workspace : {
+        driver : {
+            error: false,
+            message: ""
+        },
+        fromField : {
+            error: false,
+            message: ""
+        },
+        toField : {
+            error: false,
+            message: ""
+        },
+        dateField : {
+            error: false,
+            message: ""
+        },
+        description : {
             error: false,
             message: ""
         }
@@ -172,6 +188,7 @@
             if (!event.target.closest('.fc-event') && !event.target.closest('.workspace') && !event.target.closest('.btn-edit') && !event.target.closest('.btn-delete')) {
                 formField = 'create';
                 pageVariableRefresh();
+                buttonToggle();
             }
         });
         const changes = supabase.channel('table-db-changes').on(
@@ -326,19 +343,60 @@
          .eq('id', eventDetails.editID)
          if (error) return console.error("Unable to edit: ", error);
          formRefresh();
-        //  refreshEvents();
+    }
+
+    const formValidation = () => {
+        if (driverInput && fromInput && toInput && dateInput && description) {
+            errors.driver.error = false;
+            errors.fromField.error = false;
+            errors.toField.error = false;
+            errors.dateField.error = false;
+            errors.description.error = false;
+
+            errors.driver.message = "";
+            errors.fromField.message = "";
+            errors.toField.message = "";
+            errors.dateField.message = "";
+            errors.description.message = "";
+            return
+        }
+        if (!driverInput) {
+            errors.driver.error = true;
+            errors.driver.message = "Description required."
+            console.log("Driver: ", errors.driver);
+        }
+        if (!fromInput) {
+            errors.fromField.error = true;
+            errors.fromField.message = "From time required."
+            console.log("From: ", errors.fromField);
+        }
+        if (!toInput) {
+            errors.toField.error = true;
+            errors.toField.message = "To time required"
+            console.log("To: ", errors.toField);
+        }
+        if (!dateInput) {
+            errors.dateField.error = true;
+            errors.dateField.message = "Date required"
+            console.log("Date: ", errors.dateField);
+        }
+        if (!description) {
+            errors.description.error = true;
+            errors.description.message = "Description Required"
+            console.log("Description: ", errors.description);
+        }
+        
     }
 
     //
     const buttonToggle = () => {
+        // formValidation();
         if (!driverInput || !fromInput || !toInput || !dateInput || !description) {
             disabled = true;
-            console.log("Some input is empty");
-            console.log("Driver ID is:", driverInput);
             return
         }
         disabled = false;
-        console.log("All inputs are filled")
+        
     } 
 
     const formRefresh = () => {
@@ -413,11 +471,11 @@
                     <h1 class="roboto-medium">Schedule Driver</h1>
                     <div class="row">
                         <label for="description">Description</label>
-                        <input type="text" placeholder="Driver for..." id="description" bind:value={description} class="workspace-input"  on:input={() => buttonToggle()}/>
+                        <input type="text" placeholder="Driver for..." id="description" bind:value={description} class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}"  on:input={() => {buttonToggle(); formValidation();}}/>
                     </div>
                     <div class="row">
                         <label for="drivers">Driver</label>
-                        <select id="drivers" bind:value={driverInput} on:input={() => buttonToggle()}>
+                        <select id="drivers" bind:value={driverInput} on:input={() => {buttonToggle(); formValidation();}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
                             <option value="Select Driver" >Select Driver:</option>
                             {#each data.drivers as driver}
                                 <option value={driver.id}>{driver.name}</option>
@@ -426,15 +484,15 @@
                     </div>
                     <div class="row">
                         <label for="from">From</label>
-                        <input type="time" placeholder="From" bind:value={fromInput} id="from" class="workspace-input" on:input={() => buttonToggle()}/>
+                        <input type="time" placeholder="From" bind:value={fromInput} id="from" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();}}/>
                     </div>
                     <div class="row">
                         <label for="to">To</label>
-                        <input type="time" placeholder="To" bind:value={toInput} id="to" class="workspace-input" on:input={() => buttonToggle()}/>
+                        <input type="time" placeholder="To" bind:value={toInput} id="to" class="workspace-input" on:input={() => {buttonToggle(); formValidation();}}/>
                     </div>
                     <div class="row">
                         <label for="date">Date</label>
-                        <input type="date" placeholder="Date" bind:value={dateInput} id="date" class="workspace-input" on:input={() => buttonToggle()}/>
+                        <input type="date" placeholder="Date" bind:value={dateInput} id="date" class="workspace-input" on:input={() => {buttonToggle(); formValidation();}}/>
                     </div>
                     <button type="button" class="btn-submit" on:click={() => handleSubmit()} {disabled}>Schedule</button>
                 </form>
@@ -483,7 +541,7 @@
                     </div>
                 </div>
                 <div class="actions">
-                    <button type="button" class="btn-edit" on:click={() => formField = 'editing'}>Edit</button>
+                    <button type="button" class="btn-edit" on:click={() => {formField = 'editing'; buttonToggle(); }}>Edit</button>
                     <button type="button" class="btn-delete" on:click={() => formField = 'deletion'}>Delete</button>
                 </div>
             {:else if formField == "deletion"}
@@ -510,30 +568,30 @@
                         <label for="description">
                             Description:
                         </label>
-                        <input type="text" class="workspace-input" bind:value={description}/>
+                        <input type="text" class="workspace-input" bind:value={description} on:input={() => buttonToggle()}/>
                     </div>
                     <div class="row">
                         <label for="from">
                             From:
                         </label>
-                        <input type="time" class="workspace-input" bind:value={fromInput}/>
+                        <input type="time" class="workspace-input" bind:value={fromInput} on:input={() => buttonToggle()}/>
                     </div>
                     <div class="row">
                         <label for="to">
                             To:
                         </label>
-                        <input type="time" class="workspace-input" bind:value={toInput} />
+                        <input type="time" class="workspace-input" bind:value={toInput} on:input={() => buttonToggle()}/>
                     </div>
                     <div class="row">
                         <label for="date">
                             Date:
                         </label>
-                        <input type="date" class="workspace-input" bind:value={dateInput} />
+                        <input type="date" class="workspace-input" bind:value={dateInput} on:input={() => buttonToggle()}/>
                     </div>
 
                 </div>
                 <div class="preview-actions">
-                    <button type="button" class="btn-update" on:click={() => handleEdit()}>Update</button>
+                    <button type="button" class="btn-update" on:click={() => handleEdit()} {disabled}>Update</button>
                 </div>
             {/if}
         </div>
