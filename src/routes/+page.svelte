@@ -8,24 +8,51 @@
 
     export let data;
 
-    const changes = supabase.channel('table-db-changes').on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public', 
-          table: 'events',
-        },
-        (payload) => console.log(payload)
-      ).on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'events',
-        },
-        (payload) => console.log(payload)
-      )
-      .subscribe();
+    $: updateData = async () => {
+        const { data, error } = await supabase.from("events").select();
+        if (error) return console.error(error);
+        return {
+            eventsList: data.map((singleEvent) => ({
+                title: singleEvent.title,
+                start: singleEvent.start,
+                end: singleEvent.end,
+                resourceId: singleEvent.resourceId
+            })),
+            eventsAllCols: data ?? []
+        };
+    }
+
+    $: updateDriverData = async () => {
+        const { data, error } = await supabase.from("drivers").select();
+        if(error) return console.error(error);
+        return {
+            drivers: data ?? [],
+            driverList: data.map((driver) => ({
+                id: driver.id,
+                title: driver.name
+            }))
+        }
+    }
+
+    const updateLocalEvents = async () => {
+        const { data, error } = await supabase.from("events").select();
+        if (error) return console.error(error);
+        localEventsList = data.map((singleEvent) => ({
+            title: singleEvent.title,
+            start: singleEvent.start,
+            end: singleEvent.end,
+            resourceId: singleEvent.resourceId
+        }));
+        // console.log("Events List Going into Local: ", eventsList);
+        // eventsList.forEach((singleEvent) => {
+        //     // localEventsList = [];
+        //     localEventsList.push(singleEvent);
+        // })
+    }
+
+    $: localEventsList = [];
+
+    updateLocalEvents();
     
     let calendarEl;
     let calendar;
@@ -35,7 +62,45 @@
     const searchParams = url.searchParams;
     isLoggedIn = searchParams.get('isLoggedIn');
 
+    //Data Sources
+    $: eventsTableData = [];
+    $: driverTableData = [];
+    $: driversAllCols = [];
+    $: eventsAllCols = [];
+
+
+    $: addDataToLocal = async (toggle) => {
+        let returnedData = [];
+        if (toggle == 'events') {
+            const dbData = await updateData();
+            dbData.eventsList.forEach(singleEvent => {
+                returnedData.push(singleEvent);
+            });
+        }
+        if (toggle == 'eventsFull') {
+            const dbData = await updateData();
+            dbData.eventsAllCols.forEach(singleEvent => {
+                returnedData.push(singleEvent);
+            });
+        }
+        if (toggle == 'drivers') {
+            const dbData = await updateDriverData();
+            dbData.driverList.forEach(singleEvent => {
+                returnedData.push(singleEvent);
+            });     
+        }
+        if (toggle == 'driversFull') {
+            const dbData = await updateDriverData();
+            dbData.drivers.forEach(singleEvent => {
+                returnedData.push(singleEvent);
+            });     
+        }
+        // console.log(returnedData);
+        return returnedData;
+    }
+
     //Input fields
+    
     $: driverInput = '';
     $: fromInput = '';
     $: toInput = '';
@@ -44,8 +109,7 @@
 
     //Toggles
     $: formField = 'create'; //Options: create, editing, preview
-    $: eventsForCalendar = data.eventsList;
-    $: eventsAllCols = data.eventsAllCols;
+    
     $: resourceId = '';
     $: eventStart = '';
     $: eventEnd = '';
@@ -53,37 +117,48 @@
     $: driverName = '';
     $: eventIDEdit = '';
 
-    onMount(() => {
+    $: errors = {
+        workspace : {
+            error: false,
+            message: ""
+        }
+    }
+
+    onMount( async () => {
+        eventsTableData = await addDataToLocal("events");
+        driverTableData = await addDataToLocal("drivers");
+        driversAllCols = await addDataToLocal("driversFull");
         calendar = new Calendar(calendarEl, {
             plugins: [ resourceTimelinePlugin ],
             slotDuration: '00:10:00',
             initialView: 'resourceTimeline',
             selectable: true,
             buttonText: {
-                today: 'Today' // Change the text for the "Today" button here
+                today: 'Today'
             },
             height: "100%",
             schedulerLicenseKey: '0970091250-fcs-1710098081',
-            resources: data.driverList,
-            events: eventsForCalendar,
-            eventClick : (info) => {
+            resources: driverTableData,
+            events: eventsTableData,
+            businessHours: {
+                daysOfWeek: [1, 2, 3, 4, 5, 6, 7],
+                startTime: '06:00',
+                endTime: '20:00',
+            },
+            eventClick : async (info) => {
+                if(!isLoggedIn) return
                 formField = 'preview'
                 pageVariableRefresh(); //Refreshes all reactive variables
                 resourceId = info.event._def.resourceIds[0];
                 eventStart = info.event.startStr.slice(0, 19);
                 eventEnd = info.event.endStr.slice(0, 19);
                 eventTitle = info.event.title;
-                console.log(info);
-                console.log(resourceId);
-                console.log(eventStart);
-                console.log(eventEnd);
-                console.log(eventTitle);
                 let concatEvent = eventTitle+eventStart+eventEnd+resourceId;
-                let selectedEvent = getEventDetailsById(concatEvent);
-                console.log(selectedEvent);
-                if(!selectedEvent) return console.log("Selected Event not found.");
+                let selectedEvent = await getEventDetailsById(concatEvent);
+                if(!selectedEvent) return console.error("Selected Event not found.");
 
-                driverName = data.drivers.find((data) => data.id == selectedEvent.resourceId).name;
+                let foundDriver = driversAllCols.find((data) => data.id == selectedEvent.resourceId);
+                driverName = foundDriver.name;
                 eventIDEdit = selectedEvent.id;
                 driverInput = selectedEvent.resourceId;
                 fromInput = selectedEvent.startTime;
@@ -98,10 +173,60 @@
                 pageVariableRefresh();
             }
         });
+        const changes = supabase.channel('table-db-changes').on(
+                'postgres_changes',
+                {
+                    event: 'DELETE',
+                    schema: 'public', 
+                    table: 'events',
+                },
+                async (payload) => {
+                    eventsTableData = await addDataToLocal("events");
+                    eventsAllCols = await addDataToLocal("eventsFull");
+                    calendar.removeAllEventSources();
+                    calendar.addEventSource(eventsTableData);
+                    calendar.render();
+                }
+            ).on(       
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'events',
+                },
+                async (payload) => {
+                    eventsTableData = await addDataToLocal("events");
+                    eventsAllCols = await addDataToLocal("eventsFull");
+                    calendar.removeAllEventSources();
+                    calendar.addEventSource(eventsTableData);
+                    calendar.render();
+                }
+            ).on(       
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'events',
+                },
+                async (payload) => {
+                    console.log(payload);
+                    eventsTableData = await addDataToLocal("events");
+                    eventsAllCols = await addDataToLocal("eventsFull");
+                    calendar.removeAllEventSources();
+                    calendar.addEventSource(eventsTableData);
+                    calendar.render();
+                }
+            )
+            .subscribe();
         calendar.render();
     });
 
-    const handleSubmit = (event) => {
+    // onDestroy(() => {
+    //     // Clean up calendar instance
+    //     subscription.unsubscribe();
+    // });
+    const handleSubmit = async (event) => {
+        
         let eventDetails = {
             title: description,
             start: dateInput+"T"+fromInput+":00",
@@ -115,21 +240,25 @@
             startTime: fromInput+":00",
             endTime: toInput+":00"
         } 
-        let overlaps = checkforOverlaps(eventUpload);
-        console.log("Entry Overlaps?: ",overlaps);
-        if(overlaps) return console.log("Driver is already scheduled for this time and date. Please choose another period.");
+        let overlaps = await checkforOverlaps(eventUpload);
+        if(overlaps) return console.error("Driver is already scheduled for this time and date. Please choose another period.");
         if(fromInput >= toInput) return console.log("Incorrect input. To date is before From date.");
-        calendar.addEvent(eventDetails);
+        await updateLocalEvents();
         updateEvents(eventUpload);
-        calendar.refetchEvents();
+        calendar.render();
     }
 
-    const handleEdit = (event) => {
-        // const dbEvent = getDbEventsByID(eventIDEdit);
+    const handleEdit = async (event) => {
+        if (fromInput.length == 5){
+            fromInput = fromInput+":00";
+        }
+        if (toInput.length == 5){
+            toInput = toInput+":00";
+        }
         let eventDetails = {
             title: description,
             start: dateInput+"T"+fromInput,
-            end: dateInput+"T"+toInput+":00",
+            end: dateInput+"T"+toInput,
             resourceId: driverInput
         };
         //For upload and validation
@@ -140,35 +269,36 @@
             endTime: toInput,
             editID: eventIDEdit
         } 
-        let overlaps = checkforOverlapsEdit(eventUpload);
-        console.log("Entry Overlaps?: ",overlaps);
+        let overlaps = await checkforOverlapsEdit(eventUpload);
         if(overlaps) return console.log("Driver is already scheduled for this time and date. Please choose another period.")
         // calendar.addEvent(eventDetails);
+        
         editEvent(eventUpload);
         formField = 'create';
-        calendar.refetchEvents();
+        calendar.render();
     }
 
     const handleDeletion = async(event) => {
         const {error} = await supabase.from("events").delete().eq('id', eventIDEdit);
-        console.log("Event Deleted.");
+        if (error) return console.error("Unable to Delete Event: ", error);
         formRefresh();
         formField = 'create';
+        // calendar.render();
     }
 
 
-    const checkforOverlaps = (eventUpload) => {
-        let eventsList = eventsAllCols;
-        let driverEvents = eventsList.filter((driverEvent) => driverEvent.resourceId == eventUpload.resourceId && driverEvent.date == eventUpload.date);
+    const checkforOverlaps = async (eventUpload) => {
+        eventsAllCols = await addDataToLocal("eventsFull");
+        let driverEvents = eventsAllCols.filter((driverEvent) => driverEvent.resourceId == eventUpload.resourceId && driverEvent.date == eventUpload.date);
         let foundOverlap = driverEvents.find((singleEvent) => (eventUpload.startTime >= singleEvent.startTime && eventUpload.startTime < singleEvent.endTime) || (eventUpload.endTime > singleEvent.startTime && eventUpload.endTime <= singleEvent.endTime));
         if(!foundOverlap) return false; //No overlaps or duplicates
         return true;
 
     }
 
-    const checkforOverlapsEdit = (eventUpload) => {
-        let eventsList = eventsAllCols;
-        let driverEvents = eventsList.filter((driverEvent) => driverEvent.resourceId == eventUpload.resourceId && driverEvent.date == eventUpload.date && driverEvent.id !== eventUpload.editID);
+    const checkforOverlapsEdit = async (eventUpload) => {
+        eventsAllCols = await addDataToLocal("eventsFull");
+        let driverEvents = eventsAllCols.filter((driverEvent) => driverEvent.resourceId == eventUpload.resourceId && driverEvent.date == eventUpload.date && driverEvent.id !== eventUpload.editID);
         let foundOverlap = driverEvents.find((singleEvent) => (eventUpload.startTime >= singleEvent.startTime && eventUpload.startTime < singleEvent.endTime) || (eventUpload.endTime > singleEvent.startTime && eventUpload.endTime <= singleEvent.endTime));
         if(!foundOverlap) return false; //No overlaps or duplicates
         return true;
@@ -193,9 +323,9 @@
 
          })
          .eq('id', eventDetails.editID)
-         if (error) return console.log("Unable to edit: ", error);
+         if (error) return console.error("Unable to edit: ", error);
          formRefresh();
-         refreshEvents();
+        //  refreshEvents();
     }
 
     const formRefresh = () => {
@@ -227,29 +357,22 @@
         calendar.removeAllEventSources();
         calendar.addEventSource(events);
     }
-
-
-    const getEventDetailsById = (concatEvent) => {
+    const getEventDetailsById = async (concatEvent) => {
+        console.log("Get Event Runs");
+        eventsAllCols = await addDataToLocal("eventsFull");
         const concatFromDb = eventsAllCols.map((singleEvent) => ({
             id: singleEvent.id,
-            uniqueId: singleEvent.title+singleEvent.start+singleEvent.end+singleEvent.resourceId
-        }));
-
+            uniqueId: singleEvent.title+singleEvent.start+singleEvent.end+singleEvent.resourceId,
+            resId: singleEvent.resourceId
+        })); 
+        console.log(concatFromDb);
         const foundEvent = concatFromDb.find((data) => data.uniqueId == concatEvent);
-
         if(!foundEvent) return console.log("Event Id not found. Please check data.");
+        console.log(foundEvent);
         const returnedEvent = eventsAllCols.find((data) => data.id == foundEvent.id);
-        console.log(returnedEvent);
+        console.log("Returned even from GEDBI func: ", returnedEvent);
         return returnedEvent;
-
     }
-
-    const getDbEventsByID = async(id) => {
-        const { data, error } = await supabase.from("events").select().eq('id', id);
-        if (error) return console.log("Unable to find DB Event: ", error);
-        return data;
-    }
-
     
 
 </script>
