@@ -282,7 +282,7 @@ select:hover, select:focus {
 
 .container {
     padding: 20px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.288);
     border-radius: 10px;
     width: 400px;
     height: 55vh;
@@ -403,6 +403,19 @@ input[type="date"]::-webkit-datetime-edit {
     background-color: #0047ab;
     transition: 0.2s;
     cursor: pointer;
+}
+
+.btn-submit:disabled {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+}
+
+.btn-submit:disabled:hover {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+    cursor: not-allowed;
 }
 
 .btn-update {

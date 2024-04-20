@@ -57,6 +57,7 @@
     let calendarEl;
     let calendar;
     let isLoggedIn = false;
+    let disabled = true;
 
     const url = new URL($page.url);
     const searchParams = url.searchParams;
@@ -328,12 +329,25 @@
         //  refreshEvents();
     }
 
+    //
+    const buttonToggle = () => {
+        if (!driverInput || !fromInput || !toInput || !dateInput || !description) {
+            disabled = true;
+            console.log("Some input is empty");
+            console.log("Driver ID is:", driverInput);
+            return
+        }
+        disabled = false;
+        console.log("All inputs are filled")
+    } 
+
     const formRefresh = () => {
         driverInput = '';
         fromInput = '';
         toInput='';
         dateInput=(new Date()).toISOString().split('T')[0];
         description='';
+        buttonToggle();
     }
 
     const pageVariableRefresh = () => {
@@ -349,14 +363,6 @@
         driverName = '';
     }
 
-    const refreshEvents = () => {
-        // Update event data (fetch from API or update existing data)
-        let events = data.eventsList;
-
-        // Re-render FullCalendar with updated event data
-        calendar.removeAllEventSources();
-        calendar.addEventSource(events);
-    }
     const getEventDetailsById = async (concatEvent) => {
         console.log("Get Event Runs");
         eventsAllCols = await addDataToLocal("eventsFull");
@@ -407,30 +413,30 @@
                     <h1 class="roboto-medium">Schedule Driver</h1>
                     <div class="row">
                         <label for="description">Description</label>
-                        <input type="text" placeholder="Driver for..." id="description" bind:value={description} class="workspace-input"/>
+                        <input type="text" placeholder="Driver for..." id="description" bind:value={description} class="workspace-input"  on:input={() => buttonToggle()}/>
                     </div>
                     <div class="row">
                         <label for="drivers">Driver</label>
-                        <select id="drivers" bind:value={driverInput}>
-                        <option value="Select Driver">Select Driver:</option>
-                        {#each data.drivers as driver}
-                            <option value={driver.id}>{driver.name}</option>
-                        {/each}
-                    </select>
+                        <select id="drivers" bind:value={driverInput} on:input={() => buttonToggle()}>
+                            <option value="Select Driver" >Select Driver:</option>
+                            {#each data.drivers as driver}
+                                <option value={driver.id}>{driver.name}</option>
+                            {/each}
+                        </select>
                     </div>
                     <div class="row">
                         <label for="from">From</label>
-                        <input type="time" placeholder="From" bind:value={fromInput} id="from" class="workspace-input"/>
+                        <input type="time" placeholder="From" bind:value={fromInput} id="from" class="workspace-input" on:input={() => buttonToggle()}/>
                     </div>
                     <div class="row">
                         <label for="to">To</label>
-                        <input type="time" placeholder="To" bind:value={toInput} id="to" class="workspace-input"/>
+                        <input type="time" placeholder="To" bind:value={toInput} id="to" class="workspace-input" on:input={() => buttonToggle()}/>
                     </div>
                     <div class="row">
                         <label for="date">Date</label>
-                        <input type="date" placeholder="Date" bind:value={dateInput} id="date" class="workspace-input"/>
+                        <input type="date" placeholder="Date" bind:value={dateInput} id="date" class="workspace-input" on:input={() => buttonToggle()}/>
                     </div>
-                    <button type="button" class="btn-submit" on:click={() => handleSubmit()}>Schedule</button>
+                    <button type="button" class="btn-submit" on:click={() => handleSubmit()} {disabled}>Schedule</button>
                 </form>
             {:else if formField == "preview"}
                 <h1 class="roboto-medium">Driver Event { eventIDEdit } Preview </h1>
