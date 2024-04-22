@@ -5,6 +5,7 @@
     import { supabase } from "$lib/supabaseClient";
     import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
     import './styles.css';
+    import mllogo from "../mllogo.png";
 
     export let data;
 
@@ -35,22 +36,6 @@
             }))
         }
     }
-
-    // //Updates localEventsList
-    // const updateLocalEvents = async () => {
-    //     const { data, error } = await supabase.from("events").select();
-    //     if (error) return console.error(error);
-    //     localEventsList = data.map((singleEvent) => ({
-    //         title: singleEvent.title,
-    //         start: singleEvent.start,
-    //         end: singleEvent.end,
-    //         resourceId: singleEvent.resourceId
-    //     }));
-    // }
-
-    // $: localEventsList = [];
-
-    // updateLocalEvents();
     
     let calendarEl;
     let calendar;
@@ -524,7 +509,8 @@
 
 <header>
     <div class="title">
-        <div class="roboto-medium title-text">Muneshwers Drivers Schedule</div>
+        <img src={mllogo} alt="Muneshwers Limited Logo" class="ml-logo">
+        <div class="raleway-medium title-text"><span class="title-text-span">Muneshwers</span> Drivers Schedule</div>
     </div>
     <div class="actions">
         <a href={'/signin'}>
@@ -544,7 +530,7 @@
         <div class="workspace {formField == "preview" ? 'preview-mode': formField == "editing" ? 'edit-mode' : formField == "deletion" ? 'delete-mode' : 'default-mode'}">
             {#if formField == "create"}
                 <form action="" class="formContainer">
-                    <div class="roboto-medium workspace-title">Schedule Driver</div>
+                    <div class="poppins-medium workspace-title">Schedule Driver</div>
                     {#if errors.description.error}
                         <div class="error-message-label">
                             {errors.description.message}
