@@ -212,16 +212,16 @@ header {
 .workspace-input {
     padding: 10px;
     outline: none;
-    width: 318px;
+    width: 300px;
     border-radius: 10px;
     border: 2px rgb(187, 187, 187) solid;
 }
 
-.workspace-input:hover, .workspace-input:focus {
+.default-input:hover, .default-input:focus {
     border: 2px #0047ab solid;
 }
 
-select {
+/* select {
     padding: 10px;
     outline: none;
     width: 318px;
@@ -231,7 +231,7 @@ select {
 
 select:hover, select:focus {
     border: 2px #0047ab solid;
-}
+} */
 
 .input-error {
     border: 2px #f51c1c solid;
@@ -244,6 +244,16 @@ select:hover, select:focus {
     font-family: "Roboto", sans-serif;
     font-weight: 700;
     font-style: normal;
+
+}
+
+.error-message-label{
+    padding: 5px;
+    color: #f51c1c;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    text-align: right;
 
 }
 

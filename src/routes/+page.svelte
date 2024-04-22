@@ -8,6 +8,7 @@
 
     export let data;
 
+    //Returns JSON of eventsList for calendar and all columns
     $: updateData = async () => {
         const { data, error } = await supabase.from("events").select();
         if (error) return console.error(error);
@@ -22,6 +23,7 @@
         };
     }
 
+    //Returns JSON of driverList for calendar and all columns
     $: updateDriverData = async () => {
         const { data, error } = await supabase.from("drivers").select();
         if(error) return console.error(error);
@@ -34,42 +36,40 @@
         }
     }
 
-    const updateLocalEvents = async () => {
-        const { data, error } = await supabase.from("events").select();
-        if (error) return console.error(error);
-        localEventsList = data.map((singleEvent) => ({
-            title: singleEvent.title,
-            start: singleEvent.start,
-            end: singleEvent.end,
-            resourceId: singleEvent.resourceId
-        }));
-        // console.log("Events List Going into Local: ", eventsList);
-        // eventsList.forEach((singleEvent) => {
-        //     // localEventsList = [];
-        //     localEventsList.push(singleEvent);
-        // })
-    }
+    // //Updates localEventsList
+    // const updateLocalEvents = async () => {
+    //     const { data, error } = await supabase.from("events").select();
+    //     if (error) return console.error(error);
+    //     localEventsList = data.map((singleEvent) => ({
+    //         title: singleEvent.title,
+    //         start: singleEvent.start,
+    //         end: singleEvent.end,
+    //         resourceId: singleEvent.resourceId
+    //     }));
+    // }
 
-    $: localEventsList = [];
+    // $: localEventsList = [];
 
-    updateLocalEvents();
+    // updateLocalEvents();
     
     let calendarEl;
     let calendar;
     let isLoggedIn = false;
     let disabled = true;
 
+    //Checks for URL Parameters
     const url = new URL($page.url);
     const searchParams = url.searchParams;
     isLoggedIn = searchParams.get('isLoggedIn');
 
-    //Data Sources
+    //Main Data Sources
     $: eventsTableData = [];
     $: driverTableData = [];
     $: driversAllCols = [];
     $: eventsAllCols = [];
 
 
+    //Returns array of events or drivers based on toggle input
     $: addDataToLocal = async (toggle) => {
         let returnedData = [];
         if (toggle == 'events') {
@@ -96,12 +96,10 @@
                 returnedData.push(singleEvent);
             });     
         }
-        // console.log(returnedData);
         return returnedData;
     }
 
     //Input fields
-    
     $: driverInput = '';
     $: fromInput = '';
     $: toInput = '';
@@ -109,8 +107,9 @@
     $: description = '';
 
     //Toggles
-    $: formField = 'create'; //Options: create, editing, preview
+    $: formField = 'create'; //Options: create, editing, preview, deletion
     
+    //Fields for calendar event info
     $: resourceId = '';
     $: eventStart = '';
     $: eventEnd = '';
@@ -118,26 +117,32 @@
     $: driverName = '';
     $: eventIDEdit = '';
 
+    //Input error information
     $: errors = {
         driver : {
             error: false,
-            message: ""
+            message: "",
+            init: 0
         },
         fromField : {
             error: false,
-            message: ""
+            message: "",
+            init: 0
         },
         toField : {
             error: false,
-            message: ""
+            message: "",
+            init: 0
         },
         dateField : {
             error: false,
-            message: ""
+            message: "",
+            init: 0
         },
         description : {
             error: false,
-            message: ""
+            message: "",
+            init: 0
         }
     }
 
@@ -184,13 +189,17 @@
                 description = selectedEvent.title;
             }
         });
+        //Refreshes inputs and errors and switches workspace mode to create when clicked off of workspace and event
         document.addEventListener('click', function(event) {
             if (!event.target.closest('.fc-event') && !event.target.closest('.workspace') && !event.target.closest('.btn-edit') && !event.target.closest('.btn-delete')) {
                 formField = 'create';
                 pageVariableRefresh();
+                formValidation();
                 buttonToggle();
+                refreshErrors();
             }
         });
+        //Listens to db events inserts, updates, and deletion
         const changes = supabase.channel('table-db-changes').on(
                 'postgres_changes',
                 {
@@ -227,7 +236,6 @@
                     table: 'events',
                 },
                 async (payload) => {
-                    console.log(payload);
                     eventsTableData = await addDataToLocal("events");
                     eventsAllCols = await addDataToLocal("eventsFull");
                     calendar.removeAllEventSources();
@@ -243,6 +251,8 @@
     //     // Clean up calendar instance
     //     subscription.unsubscribe();
     // });
+
+    //Runs when user clicks the submit button
     const handleSubmit = async (event) => {
         
         let eventDetails = {
@@ -259,8 +269,17 @@
             endTime: toInput+":00"
         } 
         let overlaps = await checkforOverlaps(eventUpload);
-        if(overlaps) return console.error("Driver is already scheduled for this time and date. Please choose another period.");
-        if(fromInput >= toInput) return console.log("Incorrect input. To date is before From date.");
+        if(overlaps) {
+            errors.fromField.error = true;
+            errors.toField.error = true;
+            errors.fromField.message = "Driver is already scheduled for this time and date. Please choose another period";
+            return;
+        }
+        if(fromInput >= toInput) {
+            errors.toField.error = true;
+            errors.toField.message = "The End time is before the Start time. Please recheck your input and try again";
+            return;
+        };
         await updateLocalEvents();
         updateEvents(eventUpload);
         calendar.render();
@@ -288,23 +307,27 @@
             editID: eventIDEdit
         } 
         let overlaps = await checkforOverlapsEdit(eventUpload);
-        if(overlaps) return console.log("Driver is already scheduled for this time and date. Please choose another period.")
-        // calendar.addEvent(eventDetails);
+        if(overlaps) {
+            errors.fromField.error = true;
+            errors.toField.error = true;
+            errors.fromField.message = "Driver is already scheduled for this time and date. Please choose another period";
+            return;
+        }
         
         editEvent(eventUpload);
         formField = 'create';
         calendar.render();
     }
 
+    //Deletes event from DB using it's ID
     const handleDeletion = async(event) => {
         const {error} = await supabase.from("events").delete().eq('id', eventIDEdit);
         if (error) return console.error("Unable to Delete Event: ", error);
         formRefresh();
         formField = 'create';
-        // calendar.render();
     }
 
-
+    //Checks for overlaps in event time and date
     const checkforOverlaps = async (eventUpload) => {
         eventsAllCols = await addDataToLocal("eventsFull");
         let driverEvents = eventsAllCols.filter((driverEvent) => driverEvent.resourceId == eventUpload.resourceId && driverEvent.date == eventUpload.date);
@@ -314,6 +337,7 @@
 
     }
 
+    //Checks for overlaps not related to current event
     const checkforOverlapsEdit = async (eventUpload) => {
         eventsAllCols = await addDataToLocal("eventsFull");
         let driverEvents = eventsAllCols.filter((driverEvent) => driverEvent.resourceId == eventUpload.resourceId && driverEvent.date == eventUpload.date && driverEvent.id !== eventUpload.editID);
@@ -323,13 +347,14 @@
 
     }
 
+    //Inserts new event into DB
     const updateEvents = async(eventDetails) => {
         const { error } = await supabase.from("events").insert([eventDetails]);
-        if (error) return console.log("Unable to Insert: ", error);
-        console.log("Insert successful!");
+        if (error) return console.error("Unable to Insert: ", error);
         formRefresh();
     }
 
+    //Updates DB with new edited event
     const editEvent = async(eventDetails) => {
         const { error } = await supabase.from("events").update({ 
             title: eventDetails.title,
@@ -345,52 +370,82 @@
          formRefresh();
     }
 
-    const formValidation = () => {
-        if (driverInput && fromInput && toInput && dateInput && description) {
-            errors.driver.error = false;
-            errors.fromField.error = false;
-            errors.toField.error = false;
-            errors.dateField.error = false;
-            errors.description.error = false;
+    //Initiates input to only allow errors if the input field was used (initiated) - Copied logic from (sort of) from petty cash
+    const initializeInput = (field) => {
+        if(field == "driver") {
+            errors.driver.init++;
+        }
+        if(field == "from") {
+            errors.fromField.init++;
+        }
+        if(field == "to") {
+            errors.toField.init++;
+        }
+        if(field == "date") {
+            errors.dateField.init++;
+        }
+        if(field == "desc") {
+            errors.description.init++;
+        }
+    }
 
+    //For edit workspace. Since inputs are already initialized.
+    const initializeAllInput = () => {
+        errors.driver.init++;
+        errors.fromField.init++;
+        errors.toField.init++;
+        errors.dateField.init++;
+        errors.description.init++;
+    }
+
+    //Checks for empty fields and sets error toggles and message accordingly
+    const formValidation = () => {
+
+        if (driverInput) {
+            errors.driver.error = false;
             errors.driver.message = "";
+        }
+        if (fromInput) {
+            errors.fromField.error = false;
             errors.fromField.message = "";
+        }
+        if (toInput) {
+            errors.toField.error = false;
             errors.toField.message = "";
+        }
+        if (dateInput) {
+            errors.dateField.error = false;
             errors.dateField.message = "";
+        }
+        if (description) {
+            errors.description.error = false;
             errors.description.message = "";
-            return
         }
-        if (!driverInput) {
+        if (!driverInput && errors.driver.init > 0) {
             errors.driver.error = true;
-            errors.driver.message = "Description required."
-            console.log("Driver: ", errors.driver);
+            errors.driver.message = "Description required.";
         }
-        if (!fromInput) {
+        if (!fromInput && errors.fromField.init > 0) {
             errors.fromField.error = true;
-            errors.fromField.message = "From time required."
-            console.log("From: ", errors.fromField);
+            errors.fromField.message = "From time required.";
         }
-        if (!toInput) {
+        if (!toInput && errors.toField.init > 0) {
             errors.toField.error = true;
-            errors.toField.message = "To time required"
-            console.log("To: ", errors.toField);
+            errors.toField.message = "To time required";
         }
-        if (!dateInput) {
+        if (!dateInput && errors.dateField.init > 0) {
             errors.dateField.error = true;
-            errors.dateField.message = "Date required"
-            console.log("Date: ", errors.dateField);
+            errors.dateField.message = "Date required";
         }
-        if (!description) {
+        if (!description && errors.description.init > 0) {
             errors.description.error = true;
-            errors.description.message = "Description Required"
-            console.log("Description: ", errors.description);
+            errors.description.message = "Description Required";
         }
         
     }
 
-    //
+    //Toggles button to be disabled if one or more inputs are empty
     const buttonToggle = () => {
-        // formValidation();
         if (!driverInput || !fromInput || !toInput || !dateInput || !description) {
             disabled = true;
             return
@@ -399,6 +454,26 @@
         
     } 
 
+    //Refreshes all error fields
+    const refreshErrors = () => {
+        errors.driver.init = 0;
+        errors.driver.error = false;
+        errors.driver.message = "";
+        errors.fromField.init = 0;
+        errors.fromField.error = false;
+        errors.fromField.message = "";
+        errors.toField.init = 0;
+        errors.toField.error = false;
+        errors.toField.message = "";
+        errors.dateField.init = 0;
+        errors.dateField.error = false;
+        errors.dateField.message = "";
+        errors.description.init = 0;
+        errors.description.error = false;
+        errors.description.message = "";
+    }
+
+    //Refreshes form inputs and error initiation
     const formRefresh = () => {
         driverInput = '';
         fromInput = '';
@@ -406,8 +481,11 @@
         dateInput=(new Date()).toISOString().split('T')[0];
         description='';
         buttonToggle();
+        refreshErrors();
+        formValidation();
     }
 
+    //Refreshes all page variables used in edit and submission
     const pageVariableRefresh = () => {
         driverInput = '';
         fromInput = '';
@@ -419,22 +497,21 @@
         eventEnd = '';
         eventTitle = '';
         driverName = '';
+        refreshErrors();
+        formValidation();
     }
 
+    //Gets event details with concatenated (unique Id) event calendar fields
     const getEventDetailsById = async (concatEvent) => {
-        console.log("Get Event Runs");
         eventsAllCols = await addDataToLocal("eventsFull");
         const concatFromDb = eventsAllCols.map((singleEvent) => ({
             id: singleEvent.id,
             uniqueId: singleEvent.title+singleEvent.start+singleEvent.end+singleEvent.resourceId,
             resId: singleEvent.resourceId
         })); 
-        console.log(concatFromDb);
         const foundEvent = concatFromDb.find((data) => data.uniqueId == concatEvent);
-        if(!foundEvent) return console.log("Event Id not found. Please check data.");
-        console.log(foundEvent);
+        if(!foundEvent) return console.error("Event Id not found. Please check data.");
         const returnedEvent = eventsAllCols.find((data) => data.id == foundEvent.id);
-        console.log("Returned even from GEDBI func: ", returnedEvent);
         return returnedEvent;
     }
     
@@ -469,30 +546,55 @@
             {#if formField == "create"}
                 <form action="" class="formContainer">
                     <h1 class="roboto-medium">Schedule Driver</h1>
+                    {#if errors.description.error}
+                        <div class="error-message-label">
+                            {errors.description.message}
+                        </div>
+                    {/if}
                     <div class="row">
                         <label for="description">Description</label>
-                        <input type="text" placeholder="Driver for..." id="description" bind:value={description} class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}"  on:input={() => {buttonToggle(); formValidation();}}/>
+                        <input type="text" placeholder="Driver for..." id="description" bind:value={description} class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}"  on:input={() => {buttonToggle(); formValidation(); initializeInput("desc");}}/>
                     </div>
+                    {#if errors.driver.error}
+                        <div class="error-message-label">
+                            {errors.driver.message}
+                        </div>
+                    {/if}
                     <div class="row">
                         <label for="drivers">Driver</label>
-                        <select id="drivers" bind:value={driverInput} on:input={() => {buttonToggle(); formValidation();}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
+                        <select id="drivers" bind:value={driverInput} on:input={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
                             <option value="Select Driver" >Select Driver:</option>
                             {#each data.drivers as driver}
                                 <option value={driver.id}>{driver.name}</option>
                             {/each}
                         </select>
                     </div>
+                    {#if errors.fromField.error}
+                        <div class="error-message-label">
+                            {errors.fromField.message}
+                        </div>
+                    {/if}
                     <div class="row">
                         <label for="from">From</label>
-                        <input type="time" placeholder="From" bind:value={fromInput} id="from" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();}}/>
+                        <input type="time" placeholder="From" bind:value={fromInput} id="from" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation(); initializeInput("from");}}/>
                     </div>
+                    {#if errors.toField.error}
+                        <div class="error-message-label">
+                            {errors.toField.message}
+                        </div>
+                    {/if}
                     <div class="row">
                         <label for="to">To</label>
-                        <input type="time" placeholder="To" bind:value={toInput} id="to" class="workspace-input" on:input={() => {buttonToggle(); formValidation();}}/>
+                        <input type="time" placeholder="To" bind:value={toInput} id="to" class="workspace-input {errors.toField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation(); initializeInput("to");}}/>
                     </div>
+                    {#if errors.dateField.error}
+                        <div class="error-message-label">
+                            {errors.dateField.message}
+                        </div>
+                    {/if}
                     <div class="row">
                         <label for="date">Date</label>
-                        <input type="date" placeholder="Date" bind:value={dateInput} id="date" class="workspace-input" on:input={() => {buttonToggle(); formValidation();}}/>
+                        <input type="date" placeholder="Date" bind:value={dateInput} id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();  initializeInput("date");}}/>
                     </div>
                     <button type="button" class="btn-submit" on:click={() => handleSubmit()} {disabled}>Schedule</button>
                 </form>
@@ -541,7 +643,7 @@
                     </div>
                 </div>
                 <div class="actions">
-                    <button type="button" class="btn-edit" on:click={() => {formField = 'editing'; buttonToggle(); }}>Edit</button>
+                    <button type="button" class="btn-edit" on:click={() => {formField = 'editing'; buttonToggle(); initializeAllInput(); }}>Edit</button>
                     <button type="button" class="btn-delete" on:click={() => formField = 'deletion'}>Delete</button>
                 </div>
             {:else if formField == "deletion"}
@@ -564,29 +666,49 @@
                             {driverName}
                         </div>
                     </div>
+                    {#if errors.description.error}
+                        <div class="error-message-label">
+                            {errors.description.message}
+                        </div>
+                    {/if}
                     <div class="row">
                         <label for="description">
                             Description:
                         </label>
-                        <input type="text" class="workspace-input" bind:value={description} on:input={() => buttonToggle()}/>
+                        <input type="text" class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}" bind:value={description} on:input={() => {buttonToggle(); formValidation(); initializeInput("desc");}}/>
                     </div>
+                    {#if errors.fromField.error}
+                        <div class="error-message-label">
+                            {errors.fromField.message}
+                        </div>
+                    {/if}
                     <div class="row">
                         <label for="from">
                             From:
                         </label>
-                        <input type="time" class="workspace-input" bind:value={fromInput} on:input={() => buttonToggle()}/>
+                        <input type="time" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" bind:value={fromInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("from");}}/>
                     </div>
+                    {#if errors.toField.error}
+                        <div class="error-message-label">
+                            {errors.toField.message}
+                        </div>
+                    {/if}
                     <div class="row">
                         <label for="to">
                             To:
                         </label>
-                        <input type="time" class="workspace-input" bind:value={toInput} on:input={() => buttonToggle()}/>
+                        <input type="time" class="workspace-input {errors.toField.error == true ? 'input-error' : 'default-input'}" bind:value={toInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("to");}}/>
                     </div>
+                    {#if errors.dateField.error}
+                        <div class="error-message-label">
+                            {errors.dateField.message}
+                        </div>
+                    {/if}
                     <div class="row">
                         <label for="date">
                             Date:
                         </label>
-                        <input type="date" class="workspace-input" bind:value={dateInput} on:input={() => buttonToggle()}/>
+                        <input type="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" bind:value={dateInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("date");}}/>
                     </div>
 
                 </div>
