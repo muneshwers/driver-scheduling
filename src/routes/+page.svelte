@@ -280,7 +280,6 @@
             errors.toField.message = "The End time is before the Start time. Please recheck your input and try again";
             return;
         };
-        await updateLocalEvents();
         updateEvents(eventUpload);
         calendar.render();
     }
@@ -675,7 +674,7 @@
                         <label for="description">
                             Description:
                         </label>
-                        <input type="text" class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}" bind:value={description} on:input={() => {buttonToggle(); formValidation(); initializeInput("desc");}}/>
+                        <input type="text" id="description" class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}" bind:value={description} on:input={() => {buttonToggle(); formValidation(); initializeInput("desc");}}/>
                     </div>
                     {#if errors.fromField.error}
                         <div class="error-message-label">
@@ -686,7 +685,7 @@
                         <label for="from">
                             From:
                         </label>
-                        <input type="time" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" bind:value={fromInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("from");}}/>
+                        <input type="time" id="from" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" bind:value={fromInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("from");}}/>
                     </div>
                     {#if errors.toField.error}
                         <div class="error-message-label">
@@ -697,7 +696,7 @@
                         <label for="to">
                             To:
                         </label>
-                        <input type="time" class="workspace-input {errors.toField.error == true ? 'input-error' : 'default-input'}" bind:value={toInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("to");}}/>
+                        <input type="time" id="to" class="workspace-input {errors.toField.error == true ? 'input-error' : 'default-input'}" bind:value={toInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("to");}}/>
                     </div>
                     {#if errors.dateField.error}
                         <div class="error-message-label">
@@ -708,7 +707,7 @@
                         <label for="date">
                             Date:
                         </label>
-                        <input type="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" bind:value={dateInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("date");}}/>
+                        <input type="date" id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" bind:value={dateInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("date");}}/>
                     </div>
 
                 </div>

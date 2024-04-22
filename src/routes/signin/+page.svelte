@@ -1,5 +1,6 @@
 <script>
     import { page } from '$app/stores';
+    import logo from '../../logo.png';
     import '../styles.css';
 
     //Check for errors from params
@@ -38,6 +39,9 @@
 </svelte:head>
 <div class="signin-page">
     <div class="container">
+        <div class="logo-container">
+            <img src={logo} alt="Driver's App Logo" class="logo-image">
+        </div>
         <div class="title">
             <h1 class="roboto-medium">Muneshwers Driver Schedule</h1>
         </div>
@@ -57,3 +61,14 @@
     </div>
     
 </div>
+<style>
+    .logo-container {
+        object-fit: contain;
+        margin-top: 2%;
+    }
+
+    .logo-image {
+        height: 50px;
+        width: 50px;
+    }
+</style>

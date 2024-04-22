@@ -74,6 +74,18 @@
 
 body, .signin-page {
     font-family: Arial, Helvetica, sans-serif;
+    padding: 0;
+    margin: 0;
+    
+}
+
+.signin-page {
+    background-image: url("/signinbg.png");
+    background-size: cover;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
 }
 
 header {
@@ -82,6 +94,7 @@ header {
     align-items: center;
     padding: 20px;
     font-weight: bold;
+    margin-top: 0.5%;
     margin-bottom: 2%;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.288);
     border-radius: 10px;
@@ -244,7 +257,6 @@ select:hover, select:focus {
     font-family: "Roboto", sans-serif;
     font-weight: 700;
     font-style: normal;
-
 }
 
 .error-message-label{
@@ -254,6 +266,7 @@ select:hover, select:focus {
     font-weight: 700;
     font-style: normal;
     text-align: right;
+    font-size: medium;
 
 }
 
@@ -294,9 +307,9 @@ select:hover, select:focus {
     padding: 20px;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.288);
     border-radius: 10px;
+    background-color: white;
     width: 400px;
-    height: 55vh;
-    margin-top: 8%;
+    height: 65vh;
     margin-left: auto;
     margin-right: auto;
     text-align: center;
