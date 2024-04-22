@@ -212,7 +212,13 @@ body {
 
 .fc-view-harness {
     font-family: "Poppins", sans-serif;
+    
 }
+
+/* .fc-resourceTimeline-view{
+    margin-left: auto;
+    margin-right: auto;
+} */
 
 .signin-page {
     background-image: url("/signinbg.png");
@@ -293,6 +299,8 @@ header {
     padding: 10px;
     height: 70vh;
     width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .formContainer{
@@ -527,6 +535,8 @@ input[type="date"]::-webkit-datetime-edit {
     border-radius: 10px;
     background-color: white;
     padding: 5px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .title-text {
@@ -690,4 +700,10 @@ input[type="date"]::-webkit-datetime-edit {
 
 .close-button:hover {
     cursor: pointer;
+}
+
+@media screen and (max-width: 300px) {
+    .title-text {
+        font-size: 15px;
+    }
 }
