@@ -94,9 +94,12 @@ header {
     align-items: center;
     padding: 20px;
     font-weight: bold;
+    width: 97%;
+    margin-left: auto;
+    margin-right: auto;
     margin-top: 0.5%;
     margin-bottom: 2%;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.288);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.221);
     border-radius: 10px;
 }
 
@@ -164,8 +167,14 @@ header {
 .workspace {
     border-radius: 10px;
     width: 30%;
-    padding: 20px;
+    padding: 30px;
 }
+
+.workspace-title {
+    font-size: 28px;
+    margin-bottom: 5%;
+}
+
 
 .preview-mode {
     /* border: 2px rgba(3, 20, 255, 0.5) solid; */

@@ -544,7 +544,7 @@
         <div class="workspace {formField == "preview" ? 'preview-mode': formField == "editing" ? 'edit-mode' : formField == "deletion" ? 'delete-mode' : 'default-mode'}">
             {#if formField == "create"}
                 <form action="" class="formContainer">
-                    <h1 class="roboto-medium">Schedule Driver</h1>
+                    <div class="roboto-medium workspace-title">Schedule Driver</div>
                     {#if errors.description.error}
                         <div class="error-message-label">
                             {errors.description.message}
@@ -598,7 +598,7 @@
                     <button type="button" class="btn-submit" on:click={() => handleSubmit()} {disabled}>Schedule</button>
                 </form>
             {:else if formField == "preview"}
-                <h1 class="roboto-medium">Driver Event { eventIDEdit } Preview </h1>
+                <div class="roboto-medium workspace-title">Driver Event { eventIDEdit } Preview </div>
                 <div class="preview-container">
                     <div class="row">
                         <div class="previewLabel">
@@ -646,7 +646,7 @@
                     <button type="button" class="btn-delete" on:click={() => formField = 'deletion'}>Delete</button>
                 </div>
             {:else if formField == "deletion"}
-                <h1 class="roboto-medium">Driver Event { eventIDEdit } Preview </h1>
+                <div class="roboto-medium workspace-title">Driver Event { eventIDEdit } Preview </div>
                 <div class="preview-container">
                     Are you sure?
                 </div>
