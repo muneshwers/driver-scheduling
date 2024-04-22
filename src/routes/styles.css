@@ -285,7 +285,6 @@ header {
 
 .calendarContainer {
     padding: 10px;
-    height: 70vh;
     width: 70%;
 }
 
@@ -340,6 +339,7 @@ header {
     align-items: center;
     width: 800px;
 }
+
 .remove-link-defaults {
     text-decoration: none;
     color: black;
@@ -564,13 +564,13 @@ input[type="date"]::-webkit-datetime-edit {
 
 .btn-edit {
     border: 2px #0047ab solid;
-    background-color: #c8dbf7;
-    color: #0047ab;
+    color: white;
+    background-color: #0047ab;
 }
 
 .btn-edit:hover {
-    color: white;
-    background-color:#0047ab;
+    background-color: #c8dbf7;
+    color: #0047ab;
     transition: 0.2s;
     cursor: pointer;
 }
@@ -601,14 +601,14 @@ input[type="date"]::-webkit-datetime-edit {
 }
 
 .btn-update {
-    border: 2px rgb(119, 140, 2) solid;
-    background-color: rgb(247, 255, 200);
-    color: rgb(119, 140, 2);
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
 }
 
 .btn-update:hover {
     color: white;
-    background-color: rgb(119, 140, 2);
+    background-color: #0047ab;
     transition: 0.2s;
     cursor: pointer;
 }
@@ -629,7 +629,7 @@ input[type="date"]::-webkit-datetime-edit {
 .btn-delete {
     border: 2px #ab0000 solid;
     color: #ab0000;
-    background-color: #ffd0d0;
+    background-color: #f8e6e6;
 }
 
 .btn-delete:hover {
