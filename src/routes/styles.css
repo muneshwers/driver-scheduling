@@ -236,7 +236,7 @@ header {
     margin-bottom: 2%;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.221);
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.742);
+    background-color: rgba(255, 255, 255, 0.849);
 }
 
 .signin-button {
@@ -285,6 +285,7 @@ header {
 
 .calendarContainer {
     padding: 10px;
+    height: 70vh;
     width: 70%;
 }
 
@@ -562,6 +563,16 @@ input[type="date"]::-webkit-datetime-edit {
     font-style: normal;
 }
 
+.btn-submit-extend {
+    padding: 10px;
+    width: 120px;
+    font-size: medium;
+    border-radius: 10px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
 .btn-edit {
     border: 2px #0047ab solid;
     color: white;
@@ -636,5 +647,47 @@ input[type="date"]::-webkit-datetime-edit {
     color: white;
     background-color: #ab0000;
     transition: 0.2s;
+    cursor: pointer;
+}
+
+.info-card-modal {
+    padding: 30px;
+    background-color: rgb(255, 255, 255);
+    width: 500px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.221);
+    position: absolute;
+    top: 290px;
+    right: 400px;
+    z-index: 3000;
+}
+
+.modal-header{
+    font-size: 30px;
+    
+}
+
+.row-title {
+    color: gray;
+    width: 25%;
+}
+
+.row-details {
+    width: 75%;
+}
+
+.info-head-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5%;
+    justify-content: space-between;
+}
+
+.close-button {
+    height: 25px;
+    width: 25px;
+}
+
+.close-button:hover {
     cursor: pointer;
 }
