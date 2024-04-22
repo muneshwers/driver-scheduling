@@ -210,9 +210,9 @@ body {
     background-size: cover;
 }
 
-/* .fc-view-harness {
-    background-color: white;
-} */
+.fc-view-harness {
+    font-family: "Poppins", sans-serif;
+}
 
 .signin-page {
     background-image: url("/signinbg.png");
@@ -314,12 +314,10 @@ header {
 
 
 .preview-mode {
-    /* border: 2px rgba(3, 20, 255, 0.5) solid; */
     box-shadow: 0px 5px 15px rgba(1, 18, 255, 0.258);
 }
 
 .edit-mode {
-    /* border: 2px rgba(217, 255, 3, 0.5) solid; */
     box-shadow: 0px 5px 15px rgba(1, 18, 255, 0.258);
 }
 
@@ -328,7 +326,6 @@ header {
 }
 
 .default-mode {
-    /* border: 2px rgb(0, 0, 0, 0.5) solid; */
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.288);
 }
 
