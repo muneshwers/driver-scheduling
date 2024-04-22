@@ -90,6 +90,7 @@
     $: toInput = '';
     $: dateInput = (new Date()).toISOString().split('T')[0];
     $: description = '';
+    $: driverInputConfirm = '';
 
     //Toggles
     $: formField = 'create'; //Options: create, editing, preview, deletion
@@ -168,6 +169,7 @@
                 driverName = foundDriver.name;
                 eventIDEdit = selectedEvent.id;
                 driverInput = selectedEvent.resourceId;
+                driverInputConfirm = selectedEvent.resourceId;
                 fromInput = selectedEvent.startTime;
                 toInput = selectedEvent.endTime;
                 dateInput = selectedEvent.date;
@@ -289,14 +291,26 @@
             startTime: fromInput,
             endTime: toInput,
             editID: eventIDEdit
-        } 
-        let overlaps = await checkforOverlapsEdit(eventUpload);
-        if(overlaps) {
-            errors.fromField.error = true;
-            errors.toField.error = true;
-            errors.fromField.message = "Driver is already scheduled for this time and date. Please choose another period";
-            return;
         }
+        console.log("Edit contents: ", eventUpload);
+        if(driverInputConfirm == driverInput) {
+            let overlaps = await checkforOverlapsEdit(eventUpload);
+            if(overlaps) {
+                errors.fromField.error = true;
+                errors.toField.error = true;
+                errors.fromField.message = "Driver is already scheduled for this time and date. Please choose another period";
+                return;
+            }
+        }
+        if(driverInputConfirm !== driverInput) {
+            let overlaps = await checkforOverlaps(eventUpload);
+            if(overlaps) {
+                errors.fromField.error = true;
+                errors.toField.error = true;
+                errors.fromField.message = "Driver is already scheduled for this time and date. Please choose another period";
+                return;
+            }
+        }        
         
         editEvent(eventUpload);
         formField = 'create';
@@ -346,7 +360,8 @@
             end: eventDetails.end,
             date: eventDetails.date,
             startTime: eventDetails.startTime,
-            endTime: eventDetails.endTime
+            endTime: eventDetails.endTime,
+            resourceId: eventDetails.resourceId,
 
          })
          .eq('id', eventDetails.editID)
@@ -548,7 +563,6 @@
                     <div class="row">
                         <label for="drivers">Driver</label>
                         <select id="drivers" bind:value={driverInput} on:input={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
-                            <option value="Select Driver" >Select Driver:</option>
                             {#each data.drivers as driver}
                                 <option value={driver.id}>{driver.name}</option>
                             {/each}
@@ -647,9 +661,11 @@
                         <div class="previewLabel">
                             Driver:
                         </div>
-                        <div class="previewContent">
-                            {driverName}
-                        </div>
+                        <select id="drivers" bind:value={driverInput} on:input={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
+                            {#each data.drivers as driver}
+                                <option value={driver.id}>{driver.name}</option>
+                            {/each}
+                        </select>
                     </div>
                     {#if errors.description.error}
                         <div class="error-message-label">
