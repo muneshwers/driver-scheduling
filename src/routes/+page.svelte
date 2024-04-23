@@ -637,7 +637,7 @@
                     {/if}
                     <div class="row">
                         <label for="date">Date</label>
-                        <input type="date" placeholder="Date" bind:value={dateInput} id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();  initializeInput("date");}}/>
+                        <input type="date" placeholder="Date" bind:value={dateInput} min={dateInput} id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();  initializeInput("date");}}/>
                     </div>
                     <button type="button" class="{buttons.create.text == "Scheduling..." ? 'btn-submit-extend' : 'btn-submit'}" on:click={() => {handleSubmit(); buttons.create.text = "Scheduling..."}} {disabled} >{buttons.create.text}</button>
                 </form>
@@ -753,7 +753,7 @@
                         <label for="date">
                             Date:
                         </label>
-                        <input type="date" id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" bind:value={dateInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("date");}}/>
+                        <input type="date" id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" bind:value={dateInput} min={dateInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("date");}}/>
                     </div>
 
                 </div>
