@@ -3,6 +3,8 @@
     import logo from '../../logo.png';
     import '../styles.css';
 
+    // export let errorSignin;
+
     //Check for errors from params
     let errorSignin = "";
     const url = new URL($page.url);
@@ -17,6 +19,7 @@
     let errorToggle = false;
     let errorMessage = '';
     let disabled = true;
+
 
     if (errorSignin == "IncorrectCredentials") {
         errorToggle = true;
@@ -42,8 +45,8 @@
         <div class="logo-container">
             <img src={logo} alt="Driver's App Logo" class="logo-image">
         </div>
-        <div class="title">
-            <h1 class="roboto-medium">Muneshwers Driver Schedule</h1>
+        <div class="signin-title">
+            <h1 class="raleway-medium">Muneshwers Driver Schedule</h1>
         </div>
         {#if errorToggle}
             <div class="error-message">{errorMessage}</div>

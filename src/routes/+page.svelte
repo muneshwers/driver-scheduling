@@ -1,10 +1,12 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import { Calendar } from "@fullcalendar/core";
     import { supabase } from "$lib/supabaseClient";
     import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+    import { browser } from '$app/environment';
     import './styles.css';
+    import mllogo from "../mllogo.png";
+	import Infocard from './Infocard.svelte';
 
     export let data;
 
@@ -35,32 +37,12 @@
             }))
         }
     }
-
-    // //Updates localEventsList
-    // const updateLocalEvents = async () => {
-    //     const { data, error } = await supabase.from("events").select();
-    //     if (error) return console.error(error);
-    //     localEventsList = data.map((singleEvent) => ({
-    //         title: singleEvent.title,
-    //         start: singleEvent.start,
-    //         end: singleEvent.end,
-    //         resourceId: singleEvent.resourceId
-    //     }));
-    // }
-
-    // $: localEventsList = [];
-
-    // updateLocalEvents();
     
     let calendarEl;
     let calendar;
-    let isLoggedIn = false;
+    let isLoggedIn = data.access;
     let disabled = true;
 
-    //Checks for URL Parameters
-    const url = new URL($page.url);
-    const searchParams = url.searchParams;
-    isLoggedIn = searchParams.get('isLoggedIn');
 
     //Main Data Sources
     $: eventsTableData = [];
@@ -99,15 +81,26 @@
         return returnedData;
     }
 
+
     //Input fields
     $: driverInput = '';
     $: fromInput = '';
     $: toInput = '';
     $: dateInput = (new Date()).toISOString().split('T')[0];
     $: description = '';
+    $: driverInputConfirm = '';
 
     //Toggles
     $: formField = 'create'; //Options: create, editing, preview, deletion
+    $: calendarOn = false;
+    $: buttons = {
+        create: {
+            text: "Schedule",
+        },
+        edit: {
+            text: "Update"
+        }
+    }
     
     //Fields for calendar event info
     $: resourceId = '';
@@ -116,6 +109,15 @@
     $: eventTitle = '';
     $: driverName = '';
     $: eventIDEdit = '';
+
+    //Fields for Modal
+    $: modalDescription = '';
+    $: modalDriver = '';
+    $: modalStart = '';
+    $: modalEnd = '';
+    $: modalDate = '';
+
+    $: showModal = false;
 
     //Input error information
     $: errors = {
@@ -150,6 +152,7 @@
         eventsTableData = await addDataToLocal("events");
         driverTableData = await addDataToLocal("drivers");
         driversAllCols = await addDataToLocal("driversFull");
+        
         calendar = new Calendar(calendarEl, {
             plugins: [ resourceTimelinePlugin ],
             slotDuration: '00:10:00',
@@ -168,7 +171,6 @@
                 endTime: '20:00',
             },
             eventClick : async (info) => {
-                if(!isLoggedIn) return
                 formField = 'preview'
                 pageVariableRefresh(); //Refreshes all reactive variables
                 resourceId = info.event._def.resourceIds[0];
@@ -180,9 +182,19 @@
                 if(!selectedEvent) return console.error("Selected Event not found.");
 
                 let foundDriver = driversAllCols.find((data) => data.id == selectedEvent.resourceId);
+                if(!isLoggedIn) {
+                    showModal = true;
+                    modalDescription = selectedEvent.title;
+                    modalDriver = foundDriver.name;
+                    modalStart = selectedEvent.startTime;
+                    modalEnd = selectedEvent.endTime;
+                    modalDate = selectedEvent.date;
+                    return;
+                }
                 driverName = foundDriver.name;
                 eventIDEdit = selectedEvent.id;
                 driverInput = selectedEvent.resourceId;
+                driverInputConfirm = selectedEvent.resourceId;
                 fromInput = selectedEvent.startTime;
                 toInput = selectedEvent.endTime;
                 dateInput = selectedEvent.date;
@@ -191,12 +203,13 @@
         });
         //Refreshes inputs and errors and switches workspace mode to create when clicked off of workspace and event
         document.addEventListener('click', function(event) {
-            if (!event.target.closest('.fc-event') && !event.target.closest('.workspace') && !event.target.closest('.btn-edit') && !event.target.closest('.btn-delete')) {
+            if (!event.target.closest('.fc-event') && !event.target.closest('.workspace') && !event.target.closest('.btn-edit') && !event.target.closest('.btn-delete') && !event.target.closest('.info-card-modal')) {
                 formField = 'create';
                 pageVariableRefresh();
                 formValidation();
                 buttonToggle();
                 refreshErrors();
+                showModal = false;
             }
         });
         //Listens to db events inserts, updates, and deletion
@@ -245,6 +258,7 @@
             )
             .subscribe();
         calendar.render();
+        calendarOn = true;
     });
 
     // onDestroy(() => {
@@ -304,14 +318,26 @@
             startTime: fromInput,
             endTime: toInput,
             editID: eventIDEdit
-        } 
-        let overlaps = await checkforOverlapsEdit(eventUpload);
-        if(overlaps) {
-            errors.fromField.error = true;
-            errors.toField.error = true;
-            errors.fromField.message = "Driver is already scheduled for this time and date. Please choose another period";
-            return;
         }
+        console.log("Edit contents: ", eventUpload);
+        if(driverInputConfirm == driverInput) {
+            let overlaps = await checkforOverlapsEdit(eventUpload);
+            if(overlaps) {
+                errors.fromField.error = true;
+                errors.toField.error = true;
+                errors.fromField.message = "Driver is already scheduled for this time and date. Please choose another period";
+                return;
+            }
+        }
+        if(driverInputConfirm !== driverInput) {
+            let overlaps = await checkforOverlaps(eventUpload);
+            if(overlaps) {
+                errors.fromField.error = true;
+                errors.toField.error = true;
+                errors.fromField.message = "Driver is already scheduled for this time and date. Please choose another period";
+                return;
+            }
+        }        
         
         editEvent(eventUpload);
         formField = 'create';
@@ -361,7 +387,8 @@
             end: eventDetails.end,
             date: eventDetails.date,
             startTime: eventDetails.startTime,
-            endTime: eventDetails.endTime
+            endTime: eventDetails.endTime,
+            resourceId: eventDetails.resourceId,
 
          })
          .eq('id', eventDetails.editID)
@@ -482,6 +509,7 @@
         buttonToggle();
         refreshErrors();
         formValidation();
+        returnButtonState();
     }
 
     //Refreshes all page variables used in edit and submission
@@ -500,6 +528,11 @@
         formValidation();
     }
 
+    const returnButtonState = () => {
+        buttons.create.text = "Schedule";
+        buttons.edit.text = "Update";
+    }
+
     //Gets event details with concatenated (unique Id) event calendar fields
     const getEventDetailsById = async (concatEvent) => {
         eventsAllCols = await addDataToLocal("eventsFull");
@@ -513,6 +546,10 @@
         const returnedEvent = eventsAllCols.find((data) => data.id == foundEvent.id);
         return returnedEvent;
     }
+
+    const captureModalClose = (event) => {
+        showModal = event.detail.boolean
+    }
     
 
 </script>
@@ -524,7 +561,8 @@
 
 <header>
     <div class="title">
-        <div class="roboto-medium title-text">Muneshwers Drivers Schedule</div>
+        <img src={mllogo} alt="Muneshwers Limited Logo" class="ml-logo">
+        <div class="raleway-medium title-text"><span class="title-text-span">Muneshwers</span> Drivers Schedule</div>
     </div>
     <div class="actions">
         <a href={'/signin'}>
@@ -537,14 +575,21 @@
 
 <div class="contentContainer">
     <div class:calendarContainer={isLoggedIn} class:calendarReadOnlyContainer={!isLoggedIn}>
-        <div bind:this={calendarEl}></div>
+        {#if !browser}
+            <h1>LOADING...</h1>
+        {:else}
+            <div bind:this={calendarEl}></div>
+            {#if showModal}
+                <Infocard driverInfo={modalDriver} description={modalDescription} startTime={modalStart} endTime={modalEnd} dateInfo={modalDate} on:toggle={captureModalClose}/>
+            {/if}
+        {/if}
     </div>
 
     {#if isLoggedIn} <!-- delete-mode -->
         <div class="workspace {formField == "preview" ? 'preview-mode': formField == "editing" ? 'edit-mode' : formField == "deletion" ? 'delete-mode' : 'default-mode'}">
             {#if formField == "create"}
                 <form action="" class="formContainer">
-                    <div class="roboto-medium workspace-title">Schedule Driver</div>
+                    <div class="poppins-medium workspace-title">Schedule Driver</div>
                     {#if errors.description.error}
                         <div class="error-message-label">
                             {errors.description.message}
@@ -552,7 +597,7 @@
                     {/if}
                     <div class="row">
                         <label for="description">Description</label>
-                        <input type="text" placeholder="Driver for..." id="description" bind:value={description} class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}"  on:input={() => {buttonToggle(); formValidation(); initializeInput("desc");}}/>
+                        <input type="text" placeholder="Purpose..." id="description" bind:value={description} class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}"  on:input={() => {buttonToggle(); formValidation(); initializeInput("desc");}}/>
                     </div>
                     {#if errors.driver.error}
                         <div class="error-message-label">
@@ -562,7 +607,6 @@
                     <div class="row">
                         <label for="drivers">Driver</label>
                         <select id="drivers" bind:value={driverInput} on:input={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
-                            <option value="Select Driver" >Select Driver:</option>
                             {#each data.drivers as driver}
                                 <option value={driver.id}>{driver.name}</option>
                             {/each}
@@ -593,9 +637,9 @@
                     {/if}
                     <div class="row">
                         <label for="date">Date</label>
-                        <input type="date" placeholder="Date" bind:value={dateInput} id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();  initializeInput("date");}}/>
+                        <input type="date" placeholder="Date" bind:value={dateInput} min={dateInput} id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();  initializeInput("date");}}/>
                     </div>
-                    <button type="button" class="btn-submit" on:click={() => handleSubmit()} {disabled}>Schedule</button>
+                    <button type="button" class="{buttons.create.text == "Scheduling..." ? 'btn-submit-extend' : 'btn-submit'}" on:click={() => {handleSubmit(); buttons.create.text = "Scheduling..."}} {disabled} >{buttons.create.text}</button>
                 </form>
             {:else if formField == "preview"}
                 <div class="roboto-medium workspace-title">Driver Event { eventIDEdit } Preview </div>
@@ -661,9 +705,11 @@
                         <div class="previewLabel">
                             Driver:
                         </div>
-                        <div class="previewContent">
-                            {driverName}
-                        </div>
+                        <select id="drivers" bind:value={driverInput} on:input={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
+                            {#each data.drivers as driver}
+                                <option value={driver.id}>{driver.name}</option>
+                            {/each}
+                        </select>
                     </div>
                     {#if errors.description.error}
                         <div class="error-message-label">
@@ -707,12 +753,12 @@
                         <label for="date">
                             Date:
                         </label>
-                        <input type="date" id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" bind:value={dateInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("date");}}/>
+                        <input type="date" id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" bind:value={dateInput} min={dateInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("date");}}/>
                     </div>
 
                 </div>
                 <div class="preview-actions">
-                    <button type="button" class="btn-update" on:click={() => handleEdit()} {disabled}>Update</button>
+                    <button type="button" class="{buttons.create.text == "Scheduling..." ? 'btn-submit-extend' : 'btn-update'}" on:click={() => {handleEdit(); buttons.edit.text = "Updating..."}} {disabled}>{buttons.edit.text}</button>
                 </div>
             {/if}
         </div>

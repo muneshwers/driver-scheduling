@@ -1,4 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* <uniquifier>: Use a unique and descriptive class name */
+/* <weight>: Use a value from 100 to 900 */
+
+.raleway-medium {
+    font-family: "Raleway", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.roboto-medium {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
 
 .roboto-thin {
     font-family: "Roboto", sans-serif;
@@ -72,12 +90,135 @@
     font-style: italic;
 }
 
+.poppins-thin {
+    font-family: "Poppins", sans-serif;
+    font-weight: 100;
+    font-style: normal;
+}
+
+.poppins-extralight {
+    font-family: "Poppins", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+}
+
+.poppins-light {
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.poppins-regular {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.poppins-medium {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.poppins-semibold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.poppins-bold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.poppins-extrabold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+}
+
+.poppins-black {
+    font-family: "Poppins", sans-serif;
+    font-weight: 900;
+    font-style: normal;
+}
+
+.poppins-thin-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 100;
+    font-style: italic;
+}
+
+.poppins-extralight-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 200;
+    font-style: italic;
+}
+
+.poppins-light-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.poppins-regular-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.poppins-medium-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.poppins-semibold-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.poppins-bold-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.poppins-extrabold-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+}
+
+.poppins-black-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+}
+
 body, .signin-page {
     font-family: Arial, Helvetica, sans-serif;
     padding: 0;
     margin: 0;
     
 }
+
+body {
+    background-image: url("/signinbg.png");
+    background-size: cover;
+}
+
+.fc-view-harness {
+    font-family: "Poppins", sans-serif;
+    
+}
+
+/* .fc-resourceTimeline-view{
+    margin-left: auto;
+    margin-right: auto;
+} */
 
 .signin-page {
     background-image: url("/signinbg.png");
@@ -101,6 +242,7 @@ header {
     margin-bottom: 2%;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.221);
     border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.849);
 }
 
 .signin-button {
@@ -157,6 +299,8 @@ header {
     padding: 10px;
     height: 70vh;
     width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .formContainer{
@@ -168,6 +312,7 @@ header {
     border-radius: 10px;
     width: 30%;
     padding: 30px;
+    background-color: white;
 }
 
 .workspace-title {
@@ -177,13 +322,11 @@ header {
 
 
 .preview-mode {
-    /* border: 2px rgba(3, 20, 255, 0.5) solid; */
     box-shadow: 0px 5px 15px rgba(1, 18, 255, 0.258);
 }
 
 .edit-mode {
-    /* border: 2px rgba(217, 255, 3, 0.5) solid; */
-    box-shadow: 0px 5px 15px rgba(217, 255, 1, 0.548);
+    box-shadow: 0px 5px 15px rgba(1, 18, 255, 0.258);
 }
 
 .delete-mode {
@@ -191,8 +334,19 @@ header {
 }
 
 .default-mode {
-    /* border: 2px rgb(0, 0, 0, 0.5) solid; */
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.288);
+}
+
+.ml-logo{
+    height: 50px;
+    width: 50px;
+    margin-right: 3%;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    width: 800px;
 }
 
 .remove-link-defaults {
@@ -379,11 +533,18 @@ input[type="date"]::-webkit-datetime-edit {
 
 .fc-scrollgrid {
     border-radius: 10px;
+    background-color: white;
     padding: 5px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .title-text {
     font-size: 30px;
+}
+
+.title-text-span {
+    color: #4876B6;
 }
 /*fc-event fc-event-start fc-event-end fc-event-past fc-event-today fc-timeline-event fc-h-event*/
 
@@ -412,15 +573,25 @@ input[type="date"]::-webkit-datetime-edit {
     font-style: normal;
 }
 
+.btn-submit-extend {
+    padding: 10px;
+    width: 120px;
+    font-size: medium;
+    border-radius: 10px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
 .btn-edit {
     border: 2px #0047ab solid;
-    background-color: #c8dbf7;
-    color: #0047ab;
+    color: white;
+    background-color: #0047ab;
 }
 
 .btn-edit:hover {
-    color: white;
-    background-color:#0047ab;
+    background-color: #c8dbf7;
+    color: #0047ab;
     transition: 0.2s;
     cursor: pointer;
 }
@@ -451,14 +622,14 @@ input[type="date"]::-webkit-datetime-edit {
 }
 
 .btn-update {
-    border: 2px rgb(119, 140, 2) solid;
-    background-color: rgb(247, 255, 200);
-    color: rgb(119, 140, 2);
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
 }
 
 .btn-update:hover {
     color: white;
-    background-color: rgb(119, 140, 2);
+    background-color: #0047ab;
     transition: 0.2s;
     cursor: pointer;
 }
@@ -479,7 +650,7 @@ input[type="date"]::-webkit-datetime-edit {
 .btn-delete {
     border: 2px #ab0000 solid;
     color: #ab0000;
-    background-color: #ffd0d0;
+    background-color: #f8e6e6;
 }
 
 .btn-delete:hover {
@@ -487,4 +658,52 @@ input[type="date"]::-webkit-datetime-edit {
     background-color: #ab0000;
     transition: 0.2s;
     cursor: pointer;
+}
+
+.info-card-modal {
+    padding: 30px;
+    background-color: rgb(255, 255, 255);
+    width: 500px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.221);
+    position: absolute;
+    top: 290px;
+    right: 400px;
+    z-index: 3000;
+}
+
+.modal-header{
+    font-size: 30px;
+    
+}
+
+.row-title {
+    color: gray;
+    width: 25%;
+}
+
+.row-details {
+    width: 75%;
+}
+
+.info-head-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5%;
+    justify-content: space-between;
+}
+
+.close-button {
+    height: 25px;
+    width: 25px;
+}
+
+.close-button:hover {
+    cursor: pointer;
+}
+
+@media screen and (max-width: 300px) {
+    .title-text {
+        font-size: 15px;
+    }
 }
