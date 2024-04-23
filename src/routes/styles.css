@@ -608,6 +608,12 @@ input[type="date"]::-webkit-datetime-edit {
     cursor: pointer;
 }
 
+.btn-submit-extend {
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+}
+
 .btn-submit:disabled {
     background-color: #dbdbdb;
     border: 2px #919191 solid;
