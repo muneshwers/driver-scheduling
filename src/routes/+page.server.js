@@ -1,21 +1,15 @@
 import { supabase } from "$lib/supabaseClient";
 
 
-  export async function load() {
+  export async function load({cookies}) {
+    const access = cookies.get("loginCredents");
     const { data: drivers, error: driverError } = await supabase.from("drivers").select();
-    const { data: events, error: eventError } = await supabase.from("events").select();
-    if(driverError || eventError) {
-        return console.log(driverError || eventError);
+    if(driverError) {
+        return console.log(driverError);
     }
     return {
+      access: access,
       drivers: drivers ?? [],
-      eventsList: events.map((singleEvent) => ({
-        title: singleEvent.title,
-        start: singleEvent.start,
-        end: singleEvent.end,
-        resourceId: singleEvent.resourceId
-      })),
-      eventsAllCols: events ?? [],
       driverList: drivers.map((driver) => ({
         id: driver.id,
         title: driver.name

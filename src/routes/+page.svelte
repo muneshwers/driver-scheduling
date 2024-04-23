@@ -1,10 +1,8 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import { Calendar } from "@fullcalendar/core";
     import { supabase } from "$lib/supabaseClient";
     import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-    import { navigating } from '$app/stores';
     import { browser } from '$app/environment';
     import './styles.css';
     import mllogo from "../mllogo.png";
@@ -42,13 +40,9 @@
     
     let calendarEl;
     let calendar;
-    let isLoggedIn = false;
+    let isLoggedIn = data.access;
     let disabled = true;
 
-    //Checks for URL Parameters
-    const url = new URL($page.url);
-    const searchParams = url.searchParams;
-    isLoggedIn = searchParams.get('isLoggedIn');
 
     //Main Data Sources
     $: eventsTableData = [];
@@ -86,6 +80,7 @@
         }
         return returnedData;
     }
+
 
     //Input fields
     $: driverInput = '';
