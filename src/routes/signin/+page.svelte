@@ -3,6 +3,8 @@
     import logo from '../../logo.png';
     import '../styles.css';
 
+    // export let errorSignin;
+
     //Check for errors from params
     let errorSignin = "";
     const url = new URL($page.url);
@@ -17,6 +19,7 @@
     let errorToggle = false;
     let errorMessage = '';
     let disabled = true;
+
 
     if (errorSignin == "IncorrectCredentials") {
         errorToggle = true;
