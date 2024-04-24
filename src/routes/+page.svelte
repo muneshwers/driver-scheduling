@@ -50,6 +50,7 @@
     $: driverTableData = [];
     $: driversAllCols = [];
     $: eventsAllCols = [];
+    $: driversActiveData = [];
 
 
     //Returns array of events or drivers based on toggle input
@@ -81,6 +82,13 @@
         if (toggle == 'driversFull') {
             const dbData = await updateDriverData();
             dbData.drivers.forEach(singleEvent => {
+                returnedData.push(singleEvent);
+            });     
+        }
+        if (toggle == 'driversActive') {
+            const dbData = await updateDriverData();
+            const activeDrivers = dbData.drivers.filter((driver) => driver.status == "Active");
+            activeDrivers.forEach(singleEvent => {
                 returnedData.push(singleEvent);
             });     
         }
@@ -185,6 +193,7 @@
         eventsTableData = await addDataToLocal("events");
         driverTableData = await addDataToLocal("drivers");
         driversAllCols = await addDataToLocal("driversFull");
+        driversActiveData = await addDataToLocal("driversActive");
         
         calendar = new Calendar(calendarEl, {
             plugins: [ resourceTimelinePlugin ],
@@ -493,12 +502,14 @@
     //Searches for ID of the last driver
     const lastDriverId = async () => {
         driversAllCols = await addDataToLocal("driversFull");
+        if (driversAllCols.length < 1) {
+            return 0;
+        }
         let driverIds = [];
         driversAllCols.forEach((driver) => {
             driverIds.push(driver.id);
         });
         let sortedIds = driverIds.sort((a, b) => a - b)
-        // let sortedIds = await sortIds(driverIds);
         let lastItemIndex = sortedIds.length - 1;
         console.log(sortedIds);
         console.log(sortedIds[lastItemIndex]);
@@ -811,7 +822,7 @@
                     {/if}
                     <div class="row">
                         <label for="description" class="workspace-label">Description</label>
-                        <input type="text" placeholder="Purpose..." id="description" bind:value={description} class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}"  on:input={() => {buttonToggle(); formValidation(); initializeInput("desc");}}/>
+                        <input type="text" placeholder="Purpose..." id="description" bind:value={description} class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}"  on:input={() => {buttonToggle(); formValidation(); initializeInput("desc"); returnButtonState();}}/>
                     </div>
                     {#if errors.driver.error}
                         <div class="error-message-label">
@@ -820,8 +831,8 @@
                     {/if}
                     <div class="row">
                         <label for="drivers" class="workspace-label">Driver</label>
-                        <select id="drivers" bind:value={driverInput} on:change={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
-                            {#each driversAllCols as driver}
+                        <select id="drivers" bind:value={driverInput} on:change={() => {buttonToggle(); formValidation();  initializeInput("driver"); returnButtonState();}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
+                            {#each driversActiveData as driver}
                                 <option value={driver.id}>{driver.name}</option>
                             {/each}
                         </select>
@@ -833,7 +844,7 @@
                     {/if}
                     <div class="row">
                         <label for="from" class="workspace-label">From</label>
-                        <input type="time" placeholder="From" bind:value={fromInput} id="from" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation(); initializeInput("from");}}/>
+                        <input type="time" placeholder="From" bind:value={fromInput} id="from" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation(); initializeInput("from"); returnButtonState();}}/>
                     </div>
                     {#if errors.toField.error}
                         <div class="error-message-label">
@@ -842,7 +853,7 @@
                     {/if}
                     <div class="row">
                         <label for="to" class="workspace-label">To</label>
-                        <input type="time" placeholder="To" bind:value={toInput} id="to" class="workspace-input {errors.toField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation(); initializeInput("to");}}/>
+                        <input type="time" placeholder="To" bind:value={toInput} id="to" class="workspace-input {errors.toField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation(); initializeInput("to"); returnButtonState();}}/>
                     </div>
                     {#if errors.dateField.error}
                         <div class="error-message-label">
@@ -851,7 +862,7 @@
                     {/if}
                     <div class="row">
                         <label for="date" class="workspace-label">Date</label>
-                        <input type="date" placeholder="Date" bind:value={dateInput} min={dateInput} id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();  initializeInput("date");}}/>
+                        <input type="date" placeholder="Date" bind:value={dateInput} min={dateInput} id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();  initializeInput("date"); returnButtonState();}}/>
                     </div>
                     <button type="button" class="{buttons.create.text == "Scheduling..." ? 'btn-submit-extend' : 'btn-submit'}" on:click={() => {handleSubmit(); buttons.create.text = "Scheduling..."}} {disabled} >{buttons.create.text}</button>
                 </form>
@@ -920,7 +931,7 @@
                             Driver:
                         </div>
                         <select id="drivers" bind:value={driverInput} on:change={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
-                            {#each driversAllCols as driver}
+                            {#each driversActiveData as driver}
                                 <option value={driver.id}>{driver.name}</option>
                             {/each}
                         </select>
