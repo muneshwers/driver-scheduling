@@ -294,6 +294,7 @@
                 async (payload) => {
                     driverTableData = await addDataToLocal("drivers");
                     driversAllCols = await addDataToLocal("driversFull");
+                    driversActiveData = await addDataToLocal("driversActive");
                     calendar.render();
                 }
             ).on(       
@@ -320,6 +321,7 @@
                 async (payload) => {
                     driverTableData = await addDataToLocal("drivers");
                     driversAllCols = await addDataToLocal("driversFull");
+                    driversActiveData = await addDataToLocal("driversActive");
                     calendar.render();
                 }
             )
