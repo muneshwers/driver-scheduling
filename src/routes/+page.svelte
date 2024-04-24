@@ -6,6 +6,7 @@
     import { browser } from '$app/environment';
     import './styles.css';
     import mllogo from "../mllogo.png";
+    import arrowLeft from "../arrow-left-solid.svg";
 	import Infocard from './Infocard.svelte';
 
     export let data;
@@ -68,7 +69,12 @@
         }
         if (toggle == 'drivers') {
             const dbData = await updateDriverData();
-            dbData.driverList.forEach(singleEvent => {
+            const activeAllDrivers = dbData.drivers.filter((driver) => driver.status == "Active");
+            const activeDrivers = activeAllDrivers.map((driver) => ({
+                id: driver.id,
+                title: driver.name
+            }))
+            activeDrivers.forEach(singleEvent => {
                 returnedData.push(singleEvent);
             });     
         }
@@ -89,15 +95,27 @@
     $: dateInput = (new Date()).toISOString().split('T')[0];
     $: description = '';
     $: driverInputConfirm = '';
+    $: addDriverName = '';
+    $: editDriverId = '';
+    $: editDriverStatus = '';
+    $: editDriverStatusConfirm = '';
 
     //Toggles
     $: formField = 'create'; //Options: create, editing, preview, deletion
     $: calendarOn = false;
+    $: tabSelection = 'scheduler';
+    $: settingsPage = 'default';
     $: buttons = {
         create: {
             text: "Schedule",
         },
         edit: {
+            text: "Update"
+        },
+        driverCreate: {
+            text: "Add New"
+        },
+        driverEdit: {
             text: "Update"
         }
     }
@@ -145,7 +163,22 @@
             error: false,
             message: "",
             init: 0
-        }
+        },
+        addDriverName : {
+            error: false,
+            message: "",
+            init: 0
+        },
+        editDriverId: {
+            error: false,
+            message: "",
+            init: 0
+        },
+        editDriverStatus: {
+            error: false,
+            message: "",
+            init: 0
+        },
     }
 
     onMount( async () => {
@@ -172,6 +205,7 @@
             },
             eventClick : async (info) => {
                 formField = 'preview'
+                tabSelection = "scheduler"
                 pageVariableRefresh(); //Refreshes all reactive variables
                 resourceId = info.event._def.resourceIds[0];
                 eventStart = info.event.startStr.slice(0, 19);
@@ -244,6 +278,18 @@
             ).on(       
                 'postgres_changes',
                 {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'drivers',
+                },
+                async (payload) => {
+                    driverTableData = await addDataToLocal("drivers");
+                    driversAllCols = await addDataToLocal("driversFull");
+                    calendar.render();
+                }
+            ).on(       
+                'postgres_changes',
+                {
                     event: 'INSERT',
                     schema: 'public',
                     table: 'events',
@@ -253,6 +299,18 @@
                     eventsAllCols = await addDataToLocal("eventsFull");
                     calendar.removeAllEventSources();
                     calendar.addEventSource(eventsTableData);
+                    calendar.render();
+                }
+            ).on(       
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'drivers',
+                },
+                async (payload) => {
+                    driverTableData = await addDataToLocal("drivers");
+                    driversAllCols = await addDataToLocal("driversFull");
                     calendar.render();
                 }
             )
@@ -266,7 +324,7 @@
     //     subscription.unsubscribe();
     // });
 
-    //Runs when user clicks the submit button
+    //Runs when user clicks the submit button in scheduler
     const handleSubmit = async (event) => {
         
         let eventDetails = {
@@ -275,7 +333,7 @@
             end: dateInput+"T"+toInput+":00",
             resourceId: driverInput
         };
-        //For upload and validation
+        //For db upload and validation
         let eventUpload = {
             ...eventDetails,
             date: dateInput,
@@ -298,6 +356,33 @@
         calendar.render();
     }
 
+    //Runs when user clicks on Create for Driver Settings
+    const handleCreateDriver = async (event) => {
+
+        let newId = await lastDriverId()+1;
+        console.log(newId, ": New Id")
+        
+        let driverUpload = {
+            id: newId,
+            name: addDriverName,
+            status: "Active"
+        };
+        let driverInfo = {
+            id: newId,
+            title: addDriverName
+        }
+        let existing = await checkForExistingDrivers(driverUpload);
+        if(existing) {
+            errors.addDriverName.error = true;
+            errors.addDriverName.message = "Driver already exists. Please confirm with list on calendar.";
+            return;
+        }
+        createDriver(driverUpload);
+        calendar.addResource(driverInfo);
+        calendar.render();
+    }
+
+    //Runs when user clicks on Update in Edit Workspace
     const handleEdit = async (event) => {
         if (fromInput.length == 5){
             fromInput = fromInput+":00";
@@ -319,7 +404,6 @@
             endTime: toInput,
             editID: eventIDEdit
         }
-        console.log("Edit contents: ", eventUpload);
         if(driverInputConfirm == driverInput) {
             let overlaps = await checkforOverlapsEdit(eventUpload);
             if(overlaps) {
@@ -344,6 +428,42 @@
         calendar.render();
     }
 
+    //Runs when user clicks on Update in Driver Settings Edit
+    const handleEditDriver = async (event) => {
+        let updatedDriver = driversAllCols.find((driver) => driver.id == editDriverId);
+        let driverName = updatedDriver.name;
+        editDriverStatusConfirm = updatedDriver.status;
+
+        let driverUpload = {
+            id: editDriverId,
+            status: editDriverStatus
+        };
+
+        let driverInsert = {
+            id: editDriverId,
+            title: driverName
+        };
+        
+
+        if(editDriverStatus == editDriverStatusConfirm) {
+                errors.editDriverStatus.error = true;
+                errors.editDriverStatus.message = "Driver status has not been changed";
+                return;
+        }
+
+        if(editDriverStatus == "Inactive" || editDriverStatus == "Deactive") {
+            let removeResource = calendar.getResourceById(editDriverId);
+            removeResource.remove();
+        } 
+        if(editDriverStatus == "Active") {
+            calendar.addResource(driverInsert);
+        }
+        
+        editDriver(driverUpload);
+        formField = 'create';
+        calendar.render();
+    }
+
     //Deletes event from DB using it's ID
     const handleDeletion = async(event) => {
         const {error} = await supabase.from("events").delete().eq('id', eventIDEdit);
@@ -362,6 +482,30 @@
 
     }
 
+    //Checks for existing drivers
+    const checkForExistingDrivers = async (driverUpload) => {
+        driversAllCols = await addDataToLocal("driversFull");
+        let foundExisting = driversAllCols.find((driver) => driver.name == driverUpload.name);
+        if(!foundExisting) return false; //No overlaps or duplicates
+        return true;
+    }
+
+    //Searches for ID of the last driver
+    const lastDriverId = async () => {
+        driversAllCols = await addDataToLocal("driversFull");
+        let driverIds = [];
+        driversAllCols.forEach((driver) => {
+            driverIds.push(driver.id);
+        });
+        let sortedIds = driverIds.sort((a, b) => a - b)
+        // let sortedIds = await sortIds(driverIds);
+        let lastItemIndex = sortedIds.length - 1;
+        console.log(sortedIds);
+        console.log(sortedIds[lastItemIndex]);
+
+        return sortedIds[lastItemIndex];
+    }
+
     //Checks for overlaps not related to current event
     const checkforOverlapsEdit = async (eventUpload) => {
         eventsAllCols = await addDataToLocal("eventsFull");
@@ -372,10 +516,22 @@
 
     }
 
+    //Gets Driver Status from DB using ID
+    const getDriverStatus = (driverId) => {
+        const driverDetails = driversAllCols.find((driver) => driver.id == driverId);
+        return driverDetails.status;
+    }
+
     //Inserts new event into DB
     const updateEvents = async(eventDetails) => {
         const { error } = await supabase.from("events").insert([eventDetails]);
         if (error) return console.error("Unable to Insert: ", error);
+        formRefresh();
+    }
+
+    const createDriver = async(driverUpload) => {
+        const { error } = await supabase.from("drivers").insert([driverUpload]);
+        if (error) return console.error("Unable to create driver: ", error);
         formRefresh();
     }
 
@@ -396,6 +552,16 @@
          formRefresh();
     }
 
+    //Updates DB with new edited driver
+    const editDriver = async(driverUpload) => {
+        const { error } = await supabase.from("drivers").update({ 
+            status: driverUpload.status
+         })
+         .eq('id', driverUpload.id)
+         if (error) return console.error("Unable to edit driver: ", error);
+         formRefresh();
+    }
+
     //Initiates input to only allow errors if the input field was used (initiated) - Copied logic from (sort of) from petty cash
     const initializeInput = (field) => {
         if(field == "driver") {
@@ -412,6 +578,15 @@
         }
         if(field == "desc") {
             errors.description.init++;
+        }
+        if(field == "addDriverName") {
+            errors.addDriverName.init++;
+        }
+        if(field == "editDriverId") {
+            errors.editDriverId.init++;
+        }
+        if(field == "editDriverStatus") {
+            errors.editDriverStatus.init++;
         }
     }
 
@@ -447,6 +622,14 @@
             errors.description.error = false;
             errors.description.message = "";
         }
+        if (addDriverName) {
+            errors.addDriverName.error = false;
+            errors.addDriverName.message = "";
+        }
+        if (!addDriverName && errors.addDriverName.init > 0) {
+            errors.addDriverName.error = true;
+            errors.addDriverName.message = "Driver name required.";
+        }
         if (!driverInput && errors.driver.init > 0) {
             errors.driver.error = true;
             errors.driver.message = "Description required.";
@@ -478,7 +661,18 @@
         }
         disabled = false;
         
-    } 
+    }
+
+    const settingsButtonToggle = (section) => {
+        if (!addDriverName && section == "create") {
+            disabled = true;
+            return
+        }
+        if (!editDriverId || !editDriverStatus && section == "edit") {
+            disabled = true;
+        }
+        disabled = false;
+    }
 
     //Refreshes all error fields
     const refreshErrors = () => {
@@ -497,6 +691,15 @@
         errors.description.init = 0;
         errors.description.error = false;
         errors.description.message = "";
+        errors.addDriverName.init = 0;
+        errors.addDriverName.error = false;
+        errors.addDriverName.message = "";
+        errors.editDriverId.init = 0;
+        errors.editDriverId.error = false;
+        errors.editDriverId.message = "";
+        errors.editDriverStatus.init = 0;
+        errors.editDriverStatus.error = false;
+        errors.editDriverStatus.message = "";
     }
 
     //Refreshes form inputs and error initiation
@@ -506,6 +709,9 @@
         toInput='';
         dateInput=(new Date()).toISOString().split('T')[0];
         description='';
+        editDriverId = '';
+        editDriverStatus = '';
+        addDriverName = '';
         buttonToggle();
         refreshErrors();
         formValidation();
@@ -531,6 +737,8 @@
     const returnButtonState = () => {
         buttons.create.text = "Schedule";
         buttons.edit.text = "Update";
+        buttons.driverCreate.text = "Add New";
+        buttons.driverEdit.text = "Update";
     }
 
     //Gets event details with concatenated (unique Id) event calendar fields
@@ -586,8 +794,14 @@
     </div>
 
     {#if isLoggedIn} <!-- delete-mode -->
-        <div class="workspace {formField == "preview" ? 'preview-mode': formField == "editing" ? 'edit-mode' : formField == "deletion" ? 'delete-mode' : 'default-mode'}">
-            {#if formField == "create"}
+    <div class="workspace">
+        <div class="page-toggle">
+            <button class="tab-selector {tabSelection == "scheduler" ? "active-selector":""} roboto-medium" on:click={() => tabSelection = "scheduler"}>Scheduler</button>
+            <button class="tab-selector {tabSelection == "settings" ? "active-selector":""} roboto-medium" on:click={() => tabSelection = "settings"}>Settings</button>
+        </div>
+        <div class="workspace-field {formField == "preview" ? 'preview-mode': formField == "editing" ? 'edit-mode' : formField == "deletion" ? 'delete-mode' : 'default-mode'}">
+            
+            {#if formField == "create" && tabSelection == "scheduler"}
                 <form action="" class="formContainer">
                     <div class="poppins-medium workspace-title">Schedule Driver</div>
                     {#if errors.description.error}
@@ -596,7 +810,7 @@
                         </div>
                     {/if}
                     <div class="row">
-                        <label for="description">Description</label>
+                        <label for="description" class="workspace-label">Description</label>
                         <input type="text" placeholder="Purpose..." id="description" bind:value={description} class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}"  on:input={() => {buttonToggle(); formValidation(); initializeInput("desc");}}/>
                     </div>
                     {#if errors.driver.error}
@@ -605,9 +819,9 @@
                         </div>
                     {/if}
                     <div class="row">
-                        <label for="drivers">Driver</label>
-                        <select id="drivers" bind:value={driverInput} on:input={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
-                            {#each data.drivers as driver}
+                        <label for="drivers" class="workspace-label">Driver</label>
+                        <select id="drivers" bind:value={driverInput} on:change={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
+                            {#each driversAllCols as driver}
                                 <option value={driver.id}>{driver.name}</option>
                             {/each}
                         </select>
@@ -618,7 +832,7 @@
                         </div>
                     {/if}
                     <div class="row">
-                        <label for="from">From</label>
+                        <label for="from" class="workspace-label">From</label>
                         <input type="time" placeholder="From" bind:value={fromInput} id="from" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation(); initializeInput("from");}}/>
                     </div>
                     {#if errors.toField.error}
@@ -627,7 +841,7 @@
                         </div>
                     {/if}
                     <div class="row">
-                        <label for="to">To</label>
+                        <label for="to" class="workspace-label">To</label>
                         <input type="time" placeholder="To" bind:value={toInput} id="to" class="workspace-input {errors.toField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation(); initializeInput("to");}}/>
                     </div>
                     {#if errors.dateField.error}
@@ -636,13 +850,13 @@
                         </div>
                     {/if}
                     <div class="row">
-                        <label for="date">Date</label>
+                        <label for="date" class="workspace-label">Date</label>
                         <input type="date" placeholder="Date" bind:value={dateInput} min={dateInput} id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" on:input={() => {buttonToggle(); formValidation();  initializeInput("date");}}/>
                     </div>
                     <button type="button" class="{buttons.create.text == "Scheduling..." ? 'btn-submit-extend' : 'btn-submit'}" on:click={() => {handleSubmit(); buttons.create.text = "Scheduling..."}} {disabled} >{buttons.create.text}</button>
                 </form>
-            {:else if formField == "preview"}
-                <div class="roboto-medium workspace-title">Driver Event { eventIDEdit } Preview </div>
+            {:else if formField == "preview" && tabSelection == "scheduler"}
+                <div class="poppins-medium workspace-title">Driver Event { eventIDEdit } Preview </div>
                 <div class="preview-container">
                     <div class="row">
                         <div class="previewLabel">
@@ -689,8 +903,8 @@
                     <button type="button" class="btn-edit" on:click={() => {formField = 'editing'; buttonToggle(); initializeAllInput(); }}>Edit</button>
                     <button type="button" class="btn-delete" on:click={() => formField = 'deletion'}>Delete</button>
                 </div>
-            {:else if formField == "deletion"}
-                <div class="roboto-medium workspace-title">Driver Event { eventIDEdit } Preview </div>
+            {:else if formField == "deletion" && tabSelection == "scheduler"}
+                <div class="poppins-medium workspace-title">Driver Event { eventIDEdit } Preview </div>
                 <div class="preview-container">
                     Are you sure?
                 </div>
@@ -698,15 +912,15 @@
                     <button type="button" class="btn-delete" on:click={() => handleDeletion()}>Yes</button>
                     <button type="button" class="btn-edit" on:click={() => formField = 'preview'}>No</button>
                 </div>
-            {:else if formField == "editing"}
-                <h1 class="roboto-medium">Driver Event { eventIDEdit } Edit</h1>
+            {:else if formField == "editing" && tabSelection == "scheduler"}
+                <div class="poppins-medium workspace-title">Driver Event { eventIDEdit } Edit</div>
                 <div class="preview-container">
                     <div class="row">
                         <div class="previewLabel">
                             Driver:
                         </div>
-                        <select id="drivers" bind:value={driverInput} on:input={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
-                            {#each data.drivers as driver}
+                        <select id="drivers" bind:value={driverInput} on:change={() => {buttonToggle(); formValidation();  initializeInput("driver");}} class="workspace-input {errors.driver.error == true ? 'input-error' : 'default-input'}">
+                            {#each driversAllCols as driver}
                                 <option value={driver.id}>{driver.name}</option>
                             {/each}
                         </select>
@@ -717,7 +931,7 @@
                         </div>
                     {/if}
                     <div class="row">
-                        <label for="description">
+                        <label for="description"  class="workspace-label">
                             Description:
                         </label>
                         <input type="text" id="description" class="workspace-input {errors.description.error == true ? 'input-error' : 'default-input'}" bind:value={description} on:input={() => {buttonToggle(); formValidation(); initializeInput("desc");}}/>
@@ -728,7 +942,7 @@
                         </div>
                     {/if}
                     <div class="row">
-                        <label for="from">
+                        <label for="from" class="workspace-label">
                             From:
                         </label>
                         <input type="time" id="from" class="workspace-input {errors.fromField.error == true ? 'input-error' : 'default-input'}" bind:value={fromInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("from");}}/>
@@ -739,7 +953,7 @@
                         </div>
                     {/if}
                     <div class="row">
-                        <label for="to">
+                        <label for="to" class="workspace-label">
                             To:
                         </label>
                         <input type="time" id="to" class="workspace-input {errors.toField.error == true ? 'input-error' : 'default-input'}" bind:value={toInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("to");}}/>
@@ -750,7 +964,7 @@
                         </div>
                     {/if}
                     <div class="row">
-                        <label for="date">
+                        <label for="date" class="workspace-label">
                             Date:
                         </label>
                         <input type="date" id="date" class="workspace-input {errors.dateField.error == true ? 'input-error' : 'default-input'}" bind:value={dateInput} min={dateInput} on:input={() => {buttonToggle(); formValidation(); initializeInput("date");}}/>
@@ -760,8 +974,91 @@
                 <div class="preview-actions">
                     <button type="button" class="{buttons.create.text == "Scheduling..." ? 'btn-submit-extend' : 'btn-update'}" on:click={() => {handleEdit(); buttons.edit.text = "Updating..."}} {disabled}>{buttons.edit.text}</button>
                 </div>
+            {:else if tabSelection == "settings"}
+                <div class="poppins-medium workspace-title">Settings</div>
+                {#if settingsPage == "default"}
+                    <div class="settings-home">
+                        <!-- svelte-ignore a11y-invalid-attribute -->
+                        <button href="" class="settings-item poppins-medium" on:click={() => settingsPage = "addDriver"}>
+                            Add Driver
+                        </button>
+                        <button class="settings-item poppins-medium" on:click={() => settingsPage = "editDriver"}>
+                            Edit Driver
+                        </button>
+                    </div>
+                {:else if settingsPage == "addDriver"}
+                    <div class="settings-page">
+                        <form action="" class="formContainer">
+                            <div class="settings-page-header">
+                                <!-- svelte-ignore a11y-invalid-attribute -->
+                                <a href="" class="back-toggle" on:click={() => settingsPage = "default"}>
+                                    <img src={arrowLeft} alt="Back to Settings Home" class="back-button" />
+                                </a>
+                                <div class="poppins-medium workspace-subtitle">Add Driver</div>
+                            </div>
+                            {#if errors.addDriverName.error}
+                                <div class="error-message-label">
+                                    {errors.addDriverName.message}
+                                </div>
+                            {/if}
+                            <div class="row">
+                                <label for="addDriverName" class="workspace-label">Name</label>
+                                <input type="text" placeholder="John Doe..." id="addDriverName" bind:value={addDriverName} class="workspace-input {errors.addDriverName.error == true ? 'input-error' : 'default-input'}"  on:input={() => {settingsButtonToggle("create"); formValidation(); initializeInput("addDriverName");  returnButtonState();}}/>
+                            </div>
+                            
+                            <button type="button" class="{buttons.driverCreate.text == "Adding..." ? 'btn-submit-extend' : 'btn-submit'}" on:click={() => {handleCreateDriver(); buttons.driverCreate.text = "Adding..."}} {disabled} >{buttons.driverCreate.text}</button>
+                        </form>
+                    </div>
+                {:else if settingsPage == "editDriver"}
+                    <div class="settings-page">
+                        <form action="" class="formContainer">
+                            <div class="settings-page-header">
+                                <!-- svelte-ignore a11y-invalid-attribute -->
+                                <a href="" class="back-toggle" on:click={() => settingsPage = "default"}>
+                                    <img src={arrowLeft} alt="Back to Settings Home" class="back-button" />
+                                </a>
+                                <div class="poppins-medium workspace-subtitle">Edit Driver</div>
+                            </div>
+                            {#if errors.editDriverId.error}
+                                <div class="error-message-label">
+                                    {errors.editDriverId.message}
+                                </div>
+                            {/if}
+                            <div class="row">
+                                <label for="drivers" class="workspace-label">Select Driver</label>
+                                <select id="drivers" bind:value={editDriverId} on:change={() => {settingsButtonToggle("edit"); formValidation();  initializeInput("editDriverId"); editDriverStatus = getDriverStatus(editDriverId);  returnButtonState();}} class="workspace-input {errors.editDriverId.error == true ? 'input-error' : 'default-input'}">
+                                    {#each driversAllCols as driver}
+                                        <option value={driver.id}>{driver.name}</option>
+                                    {/each}
+                                </select>
+                            </div>
+                            {#if editDriverId && editDriverStatus}
+                                {#if errors.editDriverStatus.error}
+                                    <div class="error-message-label">
+                                        {errors.editDriverStatus.message}
+                                    </div>
+                                {/if}
+                                <div class="row">
+                                    <label for="editDriverStatus" class="workspace-label">Status</label>
+                                    <select id="editDriverStatus" bind:value={editDriverStatus} on:change={() => {settingsButtonToggle("edit"); formValidation();  initializeInput("editDriverStatus"); returnButtonState(); editDriverStatusConfirm}} class="workspace-input {errors.editDriverStatus.error == true ? 'input-error' : 'default-input'}">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Not Active</option>
+                                        <option value="Deactive">Delete</option>
+                                    </select>
+                                </div>
+                            {/if}
+                            
+                            <button type="button" class="{buttons.driverEdit.text == "Updating..." ? 'btn-submit-extend' : 'btn-submit'}" on:click={() => {handleEditDriver(); buttons.driverEdit.text = "Updating..."}} {disabled} >{buttons.driverEdit.text}</button>
+                        </form>
+                    </div>
+                {/if}
+                
+                
+
             {/if}
         </div>
+    </div>
+
         
     {/if}
 </div>

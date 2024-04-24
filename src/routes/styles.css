@@ -309,8 +309,11 @@ header {
 }
 
 .workspace {
-    border-radius: 10px;
     width: 30%;
+}
+
+.workspace-field {
+    border-radius: 0 0 10px 10px;
     padding: 30px;
     background-color: white;
 }
@@ -318,6 +321,14 @@ header {
 .workspace-title {
     font-size: 28px;
     margin-bottom: 5%;
+    padding: 10px;
+    border-bottom: 1px rgba(158, 158, 158, 0.334) solid;
+}
+
+.workspace-subtitle {
+    font-size: 18px;
+    margin-bottom: 5%;
+    color: rgb(50, 50, 50);
 }
 
 
@@ -364,6 +375,29 @@ header {
     color: #0047ab;
     transition: 0.5s;
     text-decoration: underline;
+}
+
+.settings-item {
+    text-decoration: none;
+    color: black;
+    padding: 20px;
+    margin-bottom: 1%;
+    width: 100%;
+    border: 0;
+    border-radius: 5%;
+    background-color: white;
+    cursor: pointer;
+    font-size: 15px;
+    text-align: left;
+}
+
+.settings-item:hover {
+    background-color: #c4d3e7;
+    transition: 0.2s;
+}
+
+.settings-page-header {
+    display: flex;
 }
 
 .backTohome {
@@ -433,7 +467,15 @@ select:hover, select:focus {
 
 }
 
-.workspace > .formContainer > .row > label {
+/* .workspace > .workspace-field > .formContainer > .row > label {
+    width: 25%;
+    color: rgb(89, 89, 89);
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+} */
+
+.workspace-label {
     width: 25%;
     color: rgb(89, 89, 89);
     font-family: "Roboto", sans-serif;
@@ -441,13 +483,13 @@ select:hover, select:focus {
     font-style: normal;
 }
 
-.workspace>.preview-container>.row>label {
+/* .workspace > .workspace-field > .preview-container > .row>label {
     width: 25%;
     color: rgb(89, 89, 89);
     font-family: "Roboto", sans-serif;
     font-weight: 500;
     font-style: normal;
-}
+} */
 
 
 
@@ -708,6 +750,19 @@ input[type="date"]::-webkit-datetime-edit {
     justify-content: space-between;
 }
 
+.back-button {
+    height: 25px;
+    width: 25px;
+}
+
+.back-button:hover{
+    cursor: pointer;
+}
+
+.back-toggle {
+    margin-right: 4%;
+}
+
 .close-button {
     height: 25px;
     width: 25px;
@@ -717,8 +772,39 @@ input[type="date"]::-webkit-datetime-edit {
     cursor: pointer;
 }
 
+.page-toggle {
+    display: flex;
+    justify-content: space-between;
+}
+
+.tab-selector {
+    padding: 20px;
+    border: 0;
+    width: 50%;
+    cursor: pointer;
+    font-size: 15px;
+    background-color: #d2e2f9;
+    border-radius: 5px 5px 0 0;
+}
+
+.tab-selector:hover {
+    background-color: #ffffff;
+    transition: 0.2s;
+}
+
+.active-selector {
+    background-color: #ffffff !important;
+}
+
+/* .active-selector:hover {
+    background-color: #d2e2f9 !important;
+} */
+
 @media screen and (max-width: 300px) {
     .title-text {
         font-size: 15px;
+    }
+    .info-card-modal {
+        width: 200px;
     }
 }
