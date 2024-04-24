@@ -1,0 +1,811 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* <uniquifier>: Use a unique and descriptive class name */
+/* <weight>: Use a value from 100 to 900 */
+
+.raleway-medium {
+    font-family: "Raleway", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.roboto-medium {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.roboto-thin {
+    font-family: "Roboto", sans-serif;
+    font-weight: 100;
+    font-style: normal;
+}
+
+.roboto-light {
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.roboto-regular {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.roboto-medium {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.roboto-bold {
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.roboto-black {
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+    font-style: normal;
+}
+
+.roboto-thin-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 100;
+    font-style: italic;
+}
+
+.roboto-light-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.roboto-regular-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.roboto-medium-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.roboto-bold-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.roboto-black-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+}
+
+.poppins-thin {
+    font-family: "Poppins", sans-serif;
+    font-weight: 100;
+    font-style: normal;
+}
+
+.poppins-extralight {
+    font-family: "Poppins", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+}
+
+.poppins-light {
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.poppins-regular {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.poppins-medium {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.poppins-semibold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.poppins-bold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.poppins-extrabold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+}
+
+.poppins-black {
+    font-family: "Poppins", sans-serif;
+    font-weight: 900;
+    font-style: normal;
+}
+
+.poppins-thin-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 100;
+    font-style: italic;
+}
+
+.poppins-extralight-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 200;
+    font-style: italic;
+}
+
+.poppins-light-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.poppins-regular-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.poppins-medium-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.poppins-semibold-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.poppins-bold-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.poppins-extrabold-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+}
+
+.poppins-black-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+}
+
+body, .signin-page {
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 0;
+    margin: 0;
+    
+}
+
+body {
+    background-image: url("/signinbg.png");
+    background-size: cover;
+}
+
+.fc-view-harness {
+    font-family: "Poppins", sans-serif;
+    
+}
+
+/* .fc-resourceTimeline-view{
+    margin-left: auto;
+    margin-right: auto;
+} */
+
+.signin-page {
+    background-image: url("/signinbg.png");
+    background-size: cover;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    font-weight: bold;
+    width: 97%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0.5%;
+    margin-bottom: 2%;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.221);
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.849);
+}
+
+.signin-button {
+    padding: 10px;
+    width: 100px;
+    font-size: medium;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    border-radius: 5px;
+    border: 2px #0047ab solid;
+    background-color: #0047ab;
+    color: white;
+    font-size: medium;
+}
+
+.signin-button:hover {
+    cursor: pointer;
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+    transition: 0.5s;
+}
+
+.signin-input{
+    padding: 10px;
+    outline: none;
+    border-radius: 10px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5%;
+}
+
+.signin-input:hover, .signin-input:focus {
+    border: 2px #0047ab solid;
+}
+
+.default-input {
+    border: 2px rgb(187, 187, 187) solid;
+}
+
+.contentContainer{
+    display: flex;
+}
+
+.calendarContainer {
+    padding: 10px;
+    height: 70vh;
+    width: 70%;
+}
+
+.calendarReadOnlyContainer {
+    padding: 10px;
+    height: 70vh;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.formContainer{
+    display: flex;
+    flex-direction: column;
+}
+
+.workspace {
+    width: 30%;
+}
+
+.workspace-field {
+    border-radius: 10px;
+    padding: 30px;
+    background-color: white;
+}
+
+.workspace-title {
+    font-size: 28px;
+    margin-bottom: 5%;
+    padding: 10px;
+    border-bottom: 1px rgba(158, 158, 158, 0.334) solid;
+}
+
+.workspace-subtitle {
+    font-size: 18px;
+    margin-bottom: 5%;
+    color: rgb(50, 50, 50);
+}
+
+
+.preview-mode {
+    box-shadow: 0px 5px 15px rgba(1, 18, 255, 0.258);
+}
+
+.edit-mode {
+    box-shadow: 0px 5px 15px rgba(1, 18, 255, 0.258);
+}
+
+.delete-mode {
+    box-shadow: 0px 5px 15px rgba(255, 1, 1, 0.548);
+}
+
+.default-mode {
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.288);
+}
+
+.ml-logo{
+    height: 50px;
+    width: 50px;
+    margin-right: 3%;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    width: 800px;
+}
+
+.remove-link-defaults {
+    text-decoration: none;
+    color: black;
+}
+
+.remove-link-defaults:hover{
+    color: #0047ab;
+    transition: 0.5s;
+    text-decoration: underline;
+} 
+
+.remove-link-defaults:visited {
+    color: #0047ab;
+    transition: 0.5s;
+    text-decoration: underline;
+}
+
+.settings-item {
+    text-decoration: none;
+    color: black;
+    padding: 20px;
+    margin-bottom: 1%;
+    width: 100%;
+    border: 0;
+    border-radius: 5%;
+    background-color: white;
+    cursor: pointer;
+    font-size: 15px;
+    text-align: left;
+}
+
+.settings-item:hover {
+    background-color: #c4d3e7;
+    transition: 0.2s;
+}
+
+.settings-page-header {
+    display: flex;
+}
+
+.backTohome {
+    padding: 10px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 5%;
+}
+
+/* .workspace > .formContainer > .row > input {
+    padding: 10px;
+    outline: none;
+    width: 318px;
+    border-radius: 10px;
+    border: 2px rgb(187, 187, 187) solid;
+} */
+
+.workspace-input {
+    padding: 10px;
+    outline: none;
+    width: 300px;
+    border-radius: 10px;
+    border: 2px rgb(187, 187, 187) solid;
+}
+
+.default-input:hover, .default-input:focus {
+    border: 2px #0047ab solid;
+}
+
+/* select {
+    padding: 10px;
+    outline: none;
+    width: 318px;
+    border: 2px rgb(187, 187, 187) solid;
+    border-radius: 10px;
+}
+
+select:hover, select:focus {
+    border: 2px #0047ab solid;
+} */
+
+.input-error {
+    border: 2px #f51c1c solid;
+}
+
+.error-message{
+    padding: 10px;
+    margin-bottom: 5%;
+    color: #f51c1c;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.error-message-label{
+    padding: 5px;
+    color: #f51c1c;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    text-align: right;
+    font-size: medium;
+
+}
+
+/* .workspace > .workspace-field > .formContainer > .row > label {
+    width: 25%;
+    color: rgb(89, 89, 89);
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+} */
+
+.workspace-label {
+    width: 25%;
+    color: rgb(89, 89, 89);
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+/* .workspace > .workspace-field > .preview-container > .row>label {
+    width: 25%;
+    color: rgb(89, 89, 89);
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+} */
+
+
+
+
+.submit-button {
+    border: 0;
+    padding: 10px;
+    background-color: #0047ab;
+    color: white;
+    border-radius: 10px;
+}
+
+.submit-button:hover {
+    cursor: pointer;
+    background-color: #003580;
+    transition: 0.5s;
+}
+
+.container {
+    padding: 20px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.288);
+    border-radius: 10px;
+    background-color: white;
+    width: 400px;
+    height: 65vh;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.container > form {
+    display: flex;
+    flex-direction: column;
+}
+
+.signin-submit {
+    font-size: medium;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    border: 2px #0047ab solid;
+    padding: 10px;
+    background-color: #0047ab;
+    color: white;
+    border-radius: 10px;
+    width: 120px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.signin-submit:disabled {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+}
+
+.signin-submit:disabled:hover {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+    cursor: not-allowed;
+}
+
+.signin-submit:hover {
+    cursor: pointer;
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+    transition: 0.2s;
+}
+
+.fc-event{
+    background-color: #14830c !important;
+    border: 0;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+    text-transform: uppercase;
+}
+
+.fc-scrollgrid {
+    border-radius: 10px;
+    background-color: white;
+    padding: 5px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.title-text {
+    font-size: 30px;
+}
+
+.title-text-span {
+    color: #4876B6;
+}
+/*fc-event fc-event-start fc-event-end fc-event-past fc-event-today fc-timeline-event fc-h-event*/
+
+.preview-container {
+    margin-top: 8%;
+    margin-bottom: 8%;
+}
+.previewLabel {
+    width: 25%;
+    color: rgb(89, 89, 89);
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+.previewContent {
+    margin-left: 2%;
+}
+
+.btn-edit, .btn-delete, .btn-update, .btn-submit {
+    padding: 10px;
+    width: 100px;
+    font-size: medium;
+    border-radius: 10px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.btn-submit-extend {
+    padding: 10px;
+    width: 120px;
+    font-size: medium;
+    border-radius: 10px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.btn-edit {
+    border: 2px #0047ab solid;
+    color: white;
+    background-color: #0047ab;
+}
+
+.btn-edit:hover {
+    background-color: #c8dbf7;
+    color: #0047ab;
+    transition: 0.2s;
+    cursor: pointer;
+}
+.btn-submit {
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+}
+
+.btn-submit:hover {
+    color: white;
+    background-color: #0047ab;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.btn-submit-extend {
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+}
+
+.btn-submit:disabled {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+}
+
+.btn-submit:disabled:hover {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+    cursor: not-allowed;
+}
+
+.btn-update {
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+}
+
+.btn-update:hover {
+    color: white;
+    background-color: #0047ab;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.btn-update:disabled {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+}
+
+.btn-update:disabled:hover {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+    cursor: not-allowed;
+}
+
+.btn-delete {
+    border: 2px #ab0000 solid;
+    color: #ab0000;
+    background-color: #f8e6e6;
+}
+
+.btn-delete:hover {
+    color: white;
+    background-color: #ab0000;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.modal-container {
+    background-color: rgba(0, 0, 0, 0.178);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-card-modal {
+    padding: 30px;
+    background-color: rgb(255, 255, 255);
+    width: 400px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.221);
+}
+
+.modal-header{
+    font-size: 30px;
+    
+}
+
+.row-title {
+    color: gray;
+    width: 25%;
+}
+
+.row-details {
+    width: 75%;
+}
+
+.info-head-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5%;
+    justify-content: space-between;
+}
+
+.back-button {
+    height: 25px;
+    width: 25px;
+}
+
+.back-button:hover{
+    cursor: pointer;
+}
+
+.back-toggle {
+    margin-right: 4%;
+}
+
+.close-button {
+    height: 25px;
+    width: 25px;
+}
+
+.close-button:hover {
+    cursor: pointer;
+}
+
+.page-toggle {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1%;
+}
+
+.tab-selector {
+    padding: 20px;
+    border: 0;
+    width: 50%;
+    cursor: pointer;
+    font-size: 15px;
+    background-color: #d2e2f9a7;
+    border-radius: 10px;
+}
+
+.tab-selector:hover {
+    background-color: #ffffff;
+    transition: 0.2s;
+}
+
+.active-selector {
+    background-color: #ffffff !important;
+}
+
+/* .active-selector:hover {
+    background-color: #d2e2f9 !important;
+} */
+
+@media screen and (max-width: 300px) {
+    .title-text {
+        font-size: 15px;
+    }
+    .info-card-modal {
+        width: 200px;
+    }
+}

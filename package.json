@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "vitest",
@@ -12,6 +12,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/adapter-node": "^5.0.1",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "^8.56.0",
@@ -24,5 +25,13 @@
 		"vite": "^5.0.3",
 		"vitest": "^1.2.0"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@fullcalendar/core": "^6.1.11",
+		"@fullcalendar/resource": "^6.1.11",
+		"@fullcalendar/resource-timegrid": "^6.1.11",
+		"@fullcalendar/resource-timeline": "^6.1.11",
+		"@supabase/supabase-js": "^2.42.1",
+		"fullcalendar": "^6.1.11"
+	}
 }
