@@ -1,5 +1,8 @@
+import { supabase } from "$lib/supabaseClient";
+import { redirect } from '@sveltejs/kit';
 
   export async function load({cookies}) {
+    //Get cookies
     const access = cookies.get("loginCredents");
     let loggedUser = [];
 
@@ -31,6 +34,7 @@
     }
     
     return {
+      userInfo: loggedUser,
       access: access
     };
   }
