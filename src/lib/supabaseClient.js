@@ -10,5 +10,7 @@ if (environ == "development") {
     defaultSchema = "testing";
 }
 
+console.log(`[lib/supabaseClient.js] Running on ${environ} environment using the ${defaultSchema} schema.`)
+
 export const supabase = createClient(supabaseUrl, supabaseKey, {db: { schema: defaultSchema}});
         

@@ -6,6 +6,8 @@ import { redirect } from '@sveltejs/kit';
     const access = cookies.get("loginCredents");
     let loggedUser = [];
     let environmentMode = "development"; //Options "development" and "production"
+    console.log(`[routes/+page.server.js] Running on ${environmentMode} environment.`)
+
 
     if (access) {
       const userSession = cookies.get("sessionId");

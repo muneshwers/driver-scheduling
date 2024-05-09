@@ -52,8 +52,8 @@
         schema = "testing";
     }
     
+    console.log(`[routes/+page.svelte] Using ${schema} schema.`)
 
-    console.log(`Schema is currently on ${schema}`);
     $: notification = {};
 
 
