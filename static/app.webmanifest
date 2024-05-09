@@ -6,7 +6,7 @@
     "background_color" : "white",
     "icons" : [
         {
-            "src" : "newfavicon.png",
+            "src" : "dispatch.png",
             "sizes" : "196x196",
             "type" : "image/png"
         }
