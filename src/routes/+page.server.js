@@ -5,6 +5,7 @@ import { redirect } from '@sveltejs/kit';
     //Get cookies
     const access = cookies.get("loginCredents");
     let loggedUser = [];
+    let environmentMode = "development"; //Options "development" and "production"
 
     if (access) {
       const userSession = cookies.get("sessionId");
@@ -30,11 +31,12 @@ import { redirect } from '@sveltejs/kit';
       if(!loggedUser) {
         console.error("Unable to find user from session id: ", foundSession.user);
         throw redirect(302, "/signin");
-      }    
+      }
     }
     
     return {
       userInfo: loggedUser,
-      access: access
+      access: access,
+      mode: environmentMode
     };
   }
