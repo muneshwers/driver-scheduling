@@ -6,7 +6,7 @@ self.addEventListener('message', (event) => {
   let driverNotify = event.data.data.driverName;
   let userType = event.data.data.userType;
   console.log(`User logged in is ${userSession} as ${userType}. Driver notified is ${driverNotify}.`)
-  if (userSession == driverNotify || userType!="driver") {
+  if (userSession == driverNotify) {
       self.registration.showNotification(
       notification.title,
       notification.options
