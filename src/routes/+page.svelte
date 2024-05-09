@@ -42,7 +42,19 @@
     let calendarEl;
     let calendar;
     let isLoggedIn = data.access;
+    let userInfo = data.userInfo;
+    let userType = userInfo.user_type
     let disabled = true;
+
+    //TODO Change before deployment
+    let schema = "public";
+    if(data.mode == "development") {
+        schema = "testing";
+    }
+    
+
+    console.log(`Schema is currently on ${schema}`);
+    $: notification = {};
 
 
     //Main Data Sources
@@ -195,6 +207,14 @@
         driversAllCols = await addDataToLocal("driversFull");
         driversActiveData = await addDataToLocal("driversActive");
         
+        Notification.requestPermission()
+            .then((permission) => {
+                console.log('Notifications Permissions: ' + permission);
+            })
+            .catch((error) => {
+                console.log('Permissions was rejected');
+                console.log(error);
+            });
         calendar = new Calendar(calendarEl, {
             plugins: [ resourceTimelinePlugin ],
             slotDuration: '00:10:00',
@@ -260,7 +280,7 @@
                 'postgres_changes',
                 {
                     event: 'DELETE',
-                    schema: 'public', 
+                    schema: schema, 
                     table: 'events',
                 },
                 async (payload) => {
@@ -274,7 +294,7 @@
                 'postgres_changes',
                 {
                     event: 'UPDATE',
-                    schema: 'public',
+                    schema: schema,
                     table: 'events',
                 },
                 async (payload) => {
@@ -288,7 +308,7 @@
                 'postgres_changes',
                 {
                     event: 'UPDATE',
-                    schema: 'public',
+                    schema: schema,
                     table: 'drivers',
                 },
                 async (payload) => {
@@ -301,24 +321,38 @@
                 'postgres_changes',
                 {
                     event: 'INSERT',
-                    schema: 'public',
+                    schema: schema,
                     table: 'events',
                 },
                 async (payload) => {
+                    // console.log(payload);
+                    const driverInfo = driversActiveData.find((driver) => driver.id == payload.new.resourceId);
+                    notification = {
+                        title: driverInfo.name + ': ' + payload.new.title + ' from '+payload.new.startTime+ ' to '+payload.new.endTime,
+                        options: { body: 'Trip has been scheduled' },
+                        data: {
+                            loggedUser: userInfo.display_name,
+                            driverName: driverInfo.name,
+                            userType: userType
+                        }
+                    }
                     eventsTableData = await addDataToLocal("events");
                     eventsAllCols = await addDataToLocal("eventsFull");
                     calendar.removeAllEventSources();
                     calendar.addEventSource(eventsTableData);
+                    // console.log(notification);
+                    navigator.serviceWorker.controller.postMessage(notification);
                     calendar.render();
                 }
             ).on(       
                 'postgres_changes',
                 {
                     event: 'INSERT',
-                    schema: 'public',
+                    schema: schema,
                     table: 'drivers',
                 },
                 async (payload) => {
+                    console.log(payload);
                     driverTableData = await addDataToLocal("drivers");
                     driversAllCols = await addDataToLocal("driversFull");
                     driversActiveData = await addDataToLocal("driversActive");
@@ -795,7 +829,7 @@
 </header>
 
 <div class="contentContainer">
-    <div class:calendarContainer={isLoggedIn} class:calendarReadOnlyContainer={!isLoggedIn}>
+    <div class:calendarContainer={isLoggedIn && (userType == "admin" || userType == "scheduler") } class:calendarReadOnlyContainer={!isLoggedIn || userType == "driver"}>
         {#if !browser}
             <h1>LOADING...</h1>
         {:else}
@@ -806,7 +840,7 @@
         {/if}
     </div>
 
-    {#if isLoggedIn} <!-- delete-mode -->
+    {#if isLoggedIn && (userType == "admin" || userType == "scheduler")} <!-- delete-mode -->
     <div class="workspace">
         <div class="page-toggle">
             <button class="tab-selector {tabSelection == "scheduler" ? "active-selector":""} roboto-medium" on:click={() => tabSelection = "scheduler"}>Scheduler</button>
