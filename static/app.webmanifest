@@ -1,0 +1,14 @@
+{
+    "name": "Dispatch",
+    "short_name" : "Dispatch",
+    "start_url" : "/",
+    "display" : "standalone",
+    "background_color" : "white",
+    "icons" : [
+        {
+            "src" : "newfavicon.png",
+            "sizes" : "196x196",
+            "type" : "image/png"
+        }
+    ]
+}
