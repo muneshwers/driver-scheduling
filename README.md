@@ -15,6 +15,16 @@ pnpm install
 yarn
 ```
 
+## Development
+
+Before making changes and testing and merging into production, ensure the environment is changed in the variables in following files:
+
+src/routes/+page.server.js
+- environmentMode
+
+src/lib/supabaseClient.js
+- environ
+
 ## Building
 
 To create a production version of your app:
