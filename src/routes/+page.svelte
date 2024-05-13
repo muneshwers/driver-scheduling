@@ -245,7 +245,7 @@
                 if(!selectedEvent) return console.error("Selected Event not found.");
 
                 let foundDriver = driversAllCols.find((data) => data.id == selectedEvent.resourceId);
-                if(!isLoggedIn) {
+                if(!isLoggedIn || userType == "driver") {
                     showModal = true;
                     modalDescription = selectedEvent.title;
                     modalDriver = foundDriver.name;
@@ -827,6 +827,12 @@
         </a>
     </div>
 </header>
+
+{#if userType == "driver"}
+<div class="driverWidgets">
+    
+</div>
+{/if}
 
 <div class="contentContainer">
     <div class:calendarContainer={isLoggedIn && (userType == "admin" || userType == "scheduler") } class:calendarReadOnlyContainer={!isLoggedIn || userType == "driver"}>

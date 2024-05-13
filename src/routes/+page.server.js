@@ -21,7 +21,7 @@ import { redirect } from '@sveltejs/kit';
       }
       if(usersError) {
         console.error("Unable to pull users records: ", usersError);
-        throw redirect(302, "/signin");
+        // throw redirect(302, "/signin");
       }
 
       const foundSession = sessions.find((session) => session.session_key == userSession);
