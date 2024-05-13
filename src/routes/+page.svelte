@@ -829,8 +829,16 @@
 </header>
 
 {#if userType == "driver"}
-<div class="driverWidgets">
-    
+<div class="driver-widgets">
+    <a href="/workspace/newTrip">
+        <button type="button" class="navigation-item">New Trip</button>
+    </a>
+    <a href="/workspace/newTrip">
+        <button type="button" class="navigation-item">Edit Recent Trips</button>
+    </a>
+    <a href="/workspace/trips">
+        <button type="button" class="navigation-item">Trip History</button>
+    </a>
 </div>
 {/if}
 
