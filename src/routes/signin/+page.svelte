@@ -64,14 +64,3 @@
     </div>
     
 </div>
-<style>
-    .logo-container {
-        object-fit: contain;
-        margin-top: 2%;
-    }
-
-    .logo-image {
-        height: 50px;
-        width: 50px;
-    }
-</style>
