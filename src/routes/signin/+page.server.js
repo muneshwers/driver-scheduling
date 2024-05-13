@@ -46,11 +46,11 @@ export const actions = {
                 session_key: sessionId
             }
 
-            cookies.set('sessionId', sessionId, {path: '/', sameSite: 'strict'});
+            cookies.set('sessionId', sessionId, {path: '/', httpOnly: true,  sameSite: 'strict'});
             const { error } = await supabase.from('public_sessions').insert([sessionDetails]);
             if (error) return console.error("Unable to log session: ", error);
 
-            cookies.set('loginCredents', 'true', {path: '/', sameSite: "strict"});
+            cookies.set('loginCredents', 'true', {path: '/', httpOnly: true, sameSite: "strict"});
             throw redirect(302, "/");
             
         } else {

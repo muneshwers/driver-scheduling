@@ -208,6 +208,7 @@ body, .signin-page {
 body {
     background-image: url("/signinbg.png");
     background-size: cover;
+    width: 100%;
 }
 
 .fc-view-harness {
@@ -801,11 +802,43 @@ input[type="date"]::-webkit-datetime-edit {
     background-color: #d2e2f9 !important;
 } */
 
-@media screen and (max-width: 300px) {
+@media screen and (max-width: 360px) {
     .title-text {
-        font-size: 15px;
+        font-size: 20px;
+        width: 60%;
+    }
+    body {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    header{
+        margin-top: 1%;
+        width: 87vw;
     }
     .info-card-modal {
-        width: 200px;
+        width: 300px;
+    }
+}
+
+@media screen and (max-width: 391px) and (min-width: 361px){
+    .title-text {
+        font-size: 20px;
+        width: 60%;
+    }
+
+    body {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    header {
+        margin-top: 1%;
+        width: 87vw;
+    }
+
+    .info-card-modal {
+        width: 300px;
     }
 }
