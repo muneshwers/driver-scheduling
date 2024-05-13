@@ -28,12 +28,12 @@
         <img src={arrowLeft} alt="Back to Home" class="workspace-back-button" />
     </a>
     <div class="pages">
-        <a href="/workspace/newTrip" rel="noopener noreferrer">
+        <a href="/workspace/newTrip">
             <button class="single-page poppins-medium">
                 New Trip
             </button>
         </a>
-        <a href="/workspace" rel="noopener noreferrer">
+        <a href="/workspace/trips">
             <button class="single-page poppins-medium">
                 View Trip History
             </button>
