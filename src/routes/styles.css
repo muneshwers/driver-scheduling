@@ -236,7 +236,7 @@ header {
     align-items: center;
     padding: 20px;
     font-weight: bold;
-    width: 97%;
+    width: 99%;
     margin-left: auto;
     margin-right: auto;
     margin-top: 0.5%;
@@ -385,7 +385,7 @@ header {
     margin-bottom: 1%;
     width: 100%;
     border: 0;
-    border-radius: 5%;
+    border-radius: 5px;
     background-color: white;
     cursor: pointer;
     font-size: 15px;
@@ -492,7 +492,23 @@ select:hover, select:focus {
     font-style: normal;
 } */
 
+.logo-container {
+    object-fit: contain;
+    margin-top: 2%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.logo-image {
+    height: 50px;
+    width: 50px;
+}
+
+.signin-title {
+    font-size: 32px;
+}
 
 
 .submit-button {
@@ -510,12 +526,12 @@ select:hover, select:focus {
 }
 
 .container {
-    padding: 20px;
+    padding: 30px !important;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.288);
     border-radius: 10px;
     background-color: white;
-    width: 400px;
-    height: 65vh;
+    width: 450px !important;
+    height: 70vh !important;
     margin-left: auto;
     margin-right: auto;
     text-align: center;
@@ -761,7 +777,24 @@ input[type="date"]::-webkit-datetime-edit {
 }
 
 .back-toggle {
-    margin-right: 4%;
+    margin-right: 5%;
+}
+
+.workspace-back {
+    width: 20%;
+    padding: 5px;
+    margin-left: 10%;
+    object-fit: contain;
+}
+
+.workspace-back-button {
+    height: 25px;
+    width: 25px;
+    margin-left: 1%;
+}
+
+.workspace-back-button:hover {
+    cursor: pointer;
 }
 
 .close-button {
@@ -802,6 +835,187 @@ input[type="date"]::-webkit-datetime-edit {
     background-color: #d2e2f9 !important;
 } */
 
+.driver-space {
+    background-color: white;
+    width: 99%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.space-header {
+    font-size: 28px;
+    margin-bottom: 5px;
+    padding: 10px;
+
+}
+
+.single-page {
+    text-decoration: none;
+    color: black;
+    padding: 20px;
+    margin-bottom: 1%;
+    width: 100%;
+    border: 0;
+    border-radius: 10px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 15px;
+    text-align: left;
+}
+
+.single-page:hover {
+    background-color: #c4d3e7;
+    transition: 0.2s;
+}
+
+.page-subtitle {
+    font-size: 18px;
+    margin-left: 1%;
+    color: rgb(50, 50, 50);
+}
+
+.trip-form {
+    padding: 10px;
+    margin-left: 10px;
+}
+
+.form-label {
+    width: 10%;
+    color: rgb(89, 89, 89);
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.trip-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1%;
+}
+
+.trip-form-input {
+    padding: 10px;
+    outline: none;
+    width: 300px;
+    border-radius: 10px;
+    border: 2px rgb(187, 187, 187) solid;
+}
+
+.default-input:hover,
+.default-input:focus {
+    border: 2px #0047ab solid;
+}
+
+.trip-btn-edit,
+.trip-btn-delete,
+.trip-btn-update,
+.trip-btn-submit {
+    padding: 10px;
+    width: 125px;
+    font-size: medium;
+    border-radius: 10px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.trip-btn-submit-extend {
+    padding: 10px;
+    width: 120px;
+    font-size: medium;
+    border-radius: 10px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.trip-btn-edit {
+    border: 2px #0047ab solid;
+    color: white;
+    background-color: #0047ab;
+}
+
+.trip-btn-edit:hover {
+    background-color: #c8dbf7;
+    color: #0047ab;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.trip-btn-submit {
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+}
+
+.trip-btn-submit:hover {
+    color: white;
+    background-color: #0047ab;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.trip-btn-submit-extend {
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+}
+
+.trip-btn-submit:disabled {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+}
+
+.trip-btn-submit:disabled:hover {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+    cursor: not-allowed;
+}
+
+.trip-btn-update {
+    border: 2px #0047ab solid;
+    background-color: #c8dbf7;
+    color: #0047ab;
+}
+
+.trip-btn-update:hover {
+    color: white;
+    background-color: #0047ab;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.trip-btn-update:disabled {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+}
+
+.trip-btn-update:disabled:hover {
+    background-color: #dbdbdb;
+    border: 2px #919191 solid;
+    color: rgb(126, 126, 126);
+    cursor: not-allowed;
+}
+
+.trip-btn-delete {
+    border: 2px #ab0000 solid;
+    color: #ab0000;
+    background-color: #f8e6e6;
+}
+
+.trip-btn-delete:hover {
+    color: white;
+    background-color: #ab0000;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
 @media screen and (max-width: 360px) {
     .title-text {
         font-size: 20px;
@@ -814,7 +1028,7 @@ input[type="date"]::-webkit-datetime-edit {
     }
     header{
         margin-top: 1%;
-        width: 87vw;
+        width: 100vw;
     }
     .info-card-modal {
         width: 300px;
@@ -835,7 +1049,7 @@ input[type="date"]::-webkit-datetime-edit {
 
     header {
         margin-top: 1%;
-        width: 87vw;
+        width: 100vw;
     }
 
     .info-card-modal {
