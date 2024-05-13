@@ -18,7 +18,6 @@
         </a>
     </div>
 </header>
-
 <div class="driver-space">
     <div class="space-header poppins-medium">
         Driver's Workspace
@@ -38,7 +37,17 @@
         </div>
         <div class="trip-row">
             <label for="" class="form-label">Vehicle:</label>
-            <input type="text" name="location" id="location" placeholder="GHH9999" class="trip-form-input default-input"/>
+            <select id="drivers" class="trip-form-input default-input">
+                <option value="1">GAC4612</option>
+                <option value="2">GAG1432</option>
+                <option value="3">PAE8785</option>
+                <option value="4">PAE7442</option>
+                <option value="5">PAE2709</option>
+                <option value="6">PMM5900</option>
+                <option value="7">PAC4729</option>
+                <option value="8">PAC2290</option>
+                <option value="9">PAC7412</option>
+            </select>
         </div>
         <div class="trip-row">
             <label for="" class="form-label">Start:</label>
