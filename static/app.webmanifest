@@ -6,7 +6,7 @@
     "background_color" : "white",
     "icons" : [
         {
-            "src" : "dispatch2.png",
+            "src" : "dispatch.png",
             "sizes" : "196x196",
             "type" : "image/png"
         }
