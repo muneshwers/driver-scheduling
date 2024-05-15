@@ -5,8 +5,11 @@
     import arrowLeft from "../../../arrow-left-solid.svg";
     import { supabase } from "$lib/supabaseClient";
     import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Checkbox, TableSearch } from 'flowbite-svelte';
-    
+    import { writable } from 'svelte/store';
+
     export let data;
+
+
 
 
     $: isLoggedIn = true;
@@ -50,8 +53,43 @@
     onMount( async () => {
         vehicles = await addDataToLocal("vehicles");
         trips = await addDataToLocal("trips");
+        trips = trips.sort(function(a,b){
+            return new Date(b.date) - new Date(a.date);
+        })
+        // const sortItems = writable(trips.slice());
+        // const sortKey = writable('date');
+        // const sortDirection = writable(1);
+        // const sortTable = (key) => {
+        //     if($sortKey === key) {
+        //         sortDirection.update((val) => -val);
+        //     } else {
+        //         sortKey.set(key);
+        //         sortDirection.set(1);
+        //     }
+        // };
 
     })
+
+
+   
+
+
+
+    // $: {
+    //     const key = $sortKey;
+    //     const direction = $sortDirection;
+    //     const sorted = [...$sortItems].sort((a, b) => {
+    //         const aVal = a[key];
+    //         const bVal = b[key];
+    //         if(aVal < bVal) {
+    //             return -direction;
+    //         } else if (aVal > bVal) {
+    //             return direction; 
+    //         }
+    //         return 0;
+    //     });
+    //     sortItems.set(sorted);
+    // }
 
 
 </script>
@@ -80,24 +118,24 @@
     <a href="/" class="workspace-back">
         <img src={arrowLeft} alt="Back to Home" class="workspace-back-button" />
     </a>
-    <Table>
+    <Table hoverable={true}>
         <TableHead>
+            <TableHeadCell>Date</TableHeadCell>
             <TableHeadCell>Location</TableHeadCell>
             <TableHeadCell>Vehicle</TableHeadCell>
             <TableHeadCell>Start</TableHeadCell>
             <TableHeadCell>End</TableHeadCell>
             <TableHeadCell>Odometer</TableHeadCell>
-            <TableHeadCell>Date</TableHeadCell>
         </TableHead>
         <TableBody tableBodyClass="divide-y">
             {#each trips as trip}
             <TableBodyRow>
+                <TableBodyCell>{trip.date}</TableBodyCell>
                 <TableBodyCell>{trip.location}</TableBodyCell>
                 <TableBodyCell>{vehicles.find((vehicle) => vehicle.id == trip.vehicle).number + " - " + vehicles.find((vehicle) => vehicle.id == trip.vehicle).name}</TableBodyCell>
                 <TableBodyCell>{trip.start}</TableBodyCell>
                 <TableBodyCell>{trip.end}</TableBodyCell>
                 <TableBodyCell>{trip.odometer}</TableBodyCell>
-                <TableBodyCell>{trip.date}</TableBodyCell>
             </TableBodyRow>
             {/each}
         </TableBody>
