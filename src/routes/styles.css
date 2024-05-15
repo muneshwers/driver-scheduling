@@ -468,6 +468,15 @@ select:hover, select:focus {
 
 }
 
+.trip-error-message-label {
+    padding: 5px;
+    color: #f51c1c;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: medium;
+}
+
 /* .workspace > .workspace-field > .formContainer > .row > label {
     width: 25%;
     color: rgb(89, 89, 89);
@@ -935,7 +944,6 @@ input[type="date"]::-webkit-datetime-edit {
     outline: none;
     width: 300px;
     border-radius: 10px;
-    border: 2px rgb(187, 187, 187) solid;
 }
 
 .default-input:hover,
@@ -1050,6 +1058,64 @@ input[type="date"]::-webkit-datetime-edit {
     cursor: pointer;
 }
 
+.trip-modal {
+    width: 500px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.trip-title {
+    font-size: 32px;
+}
+.trip-subtitle {
+    color: rgb(88, 88, 88);
+}
+
+.trip-details {
+    padding: 10px;
+    margin-top: 5px;
+}
+
+.modal-row {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+    align-items: center;
+    
+}
+
+.trip-label {
+    width: 30%;
+}
+
+/* .modal-input {
+    width: 70%;
+    padding: 10px;
+    border-radius: 10px;
+} */
+
+.modal-input {
+    padding: 10px;
+    outline: none;
+    width: 300px;
+    border-radius: 10px;
+}
+
+.default-input:hover,
+.default-input:focus {
+    border: 2px #0047ab solid;
+}
+
+.default-input:disabled {
+    border: 2px #727272 solid;
+    color:#4b4b4b;
+}
+
+.attention-input {
+    border: 2px #0047ab solid;
+}
+
 @media screen and (max-width: 360px) {
     .title-text {
         font-size: 20px;
@@ -1083,6 +1149,12 @@ input[type="date"]::-webkit-datetime-edit {
     }
     .navigation-item {
         margin-right: 0px;
+    }
+    .trip-modal {
+        width: 355px;
+    }
+    .modal-input {
+        width: 250px;
     }
 }
 
@@ -1127,6 +1199,10 @@ input[type="date"]::-webkit-datetime-edit {
     .trip-form-input {
         width: 350px;
     }
+
+    .trip-modal {
+        width: 400px;
+    }
 }
 
 @media screen and (max-width: 431px) and (min-width: 392px) {
@@ -1170,5 +1246,9 @@ input[type="date"]::-webkit-datetime-edit {
 
     .trip-form-input {
         width: 365px;
+    }
+
+    .trip-modal {
+        width: 400px;
     }
 }
