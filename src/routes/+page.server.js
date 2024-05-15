@@ -5,6 +5,7 @@ import { redirect } from '@sveltejs/kit';
     //Get cookies
     const access = cookies.get("loginCredents");
     let loggedUser = [];
+    let vehicleList = [];
     let environmentMode = "development"; //Options "development" and "production"
     console.log(`[routes/+page.server.js] Running on ${environmentMode} environment.`)
 
@@ -15,11 +16,16 @@ import { redirect } from '@sveltejs/kit';
       //Pulls session for session ID
       const { data: sessions, error } = await supabase.from("public_sessions").select();
       const { data: users, error: usersError } = await supabase.from("users").select();
+      const { data: vehicles, error: vehicleError } = await supabase.from("vehicles").select();
       if(error) {
         console.error("Unable to pull sessions: ", error);
         throw redirect(302, "/signin");
       }
       if(usersError) {
+        console.error("Unable to pull users records: ", usersError);
+        // throw redirect(302, "/signin");
+      }
+      if(vehicleError) {
         console.error("Unable to pull users records: ", usersError);
         // throw redirect(302, "/signin");
       }
@@ -30,6 +36,7 @@ import { redirect } from '@sveltejs/kit';
         throw redirect(302, "/signin");
       }
       loggedUser = users.find((user) => user.id == foundSession.user);
+      vehicleList = vehicles;
       if(!loggedUser) {
         console.error("Unable to find user from session id: ", foundSession.user);
         throw redirect(302, "/signin");
@@ -39,6 +46,7 @@ import { redirect } from '@sveltejs/kit';
     return {
       userInfo: loggedUser,
       access: access,
-      mode: environmentMode
+      mode: environmentMode,
+      vehicleList: vehicleList
     };
   }
