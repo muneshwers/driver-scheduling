@@ -29,7 +29,7 @@ export const actions = {
         const { data: users, error } = await supabase.from("users").select();
         if(error) return console.error(error);
         const data = await request.formData();
-        const username = data.get('username');
+        const username = data.get('username').toLowerCase();
         const password = data.get('password');
 
         let formError = "IncorrectCredentials";
