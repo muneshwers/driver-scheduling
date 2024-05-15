@@ -4,9 +4,12 @@
 
     export let tripDetails;
     export let vehicles;
+    export let allTrips;
 
     $: editToggle = false;
     $: tripEnd = '';
+    $: tripError = false;
+    $: tripErrorMessage = '';
     let vehicleNumber = vehicles.number;
     let vehicleType = vehicles.name;
     let vehicleName = vehicleNumber + " - " + vehicleType;
@@ -15,10 +18,29 @@
     const handleStop = async () => {
         let tripData = {
             id: tripDetails.id,
+            date: tripDetails.date,
             end: tripEnd
         }
+        let overlaps = checkForOverlaps(tripData);
+        if(overlaps) {
+            tripError = true;
+            tripErrorMessage = "End time is earlier than start time. Please check your input and try again.";
+            return;
+        };
         stopTrip(tripData);
         closeField();
+    }
+
+    const checkForOverlaps = (tripData) => {
+        let foundExisting = allTrips.filter((trip) => trip.date == tripData.date && trip.start >= tripData.end);
+        console.log(foundExisting);
+        if(!foundExisting) return false;
+        return true;
+    }
+
+    const clearErrors = () => {
+        tripError = false;
+        tripErrorMessage = "";
     }
 
         //Updates DB with new edited driver
@@ -81,13 +103,18 @@
                 <input type="time" name="start" id="start" bind:value={tripDetails.start} class="modal-input default-input" disabled>
             </div>
             {#if editToggle}
-            <div class="modal-row">
-                <label for="end" class="trip-label">
-                    End Time
-                </label>
-                <input type="time" name="end" id="end" bind:value={tripEnd} class="modal-input attention-input">
-            </div>
-            <button type="button" class="trip-btn-submit" on:click={() => handleStop()}>End Trip</button>
+                {#if tripError}
+                    <div class="trip-error-message-label">
+                        {tripErrorMessage}
+                    </div>
+                {/if}
+                <div class="modal-row">
+                    <label for="end" class="trip-label">
+                        End Time
+                    </label>
+                    <input type="time" name="end" id="end" bind:value={tripEnd} class="modal-input {tripError == true ? 'input-error' : 'attention-input'} " on:input={() => clearErrors()}>
+                </div>
+                <button type="button" class="trip-btn-submit" on:click={() => handleStop()}>End Trip</button>
             {/if}
             {#if !editToggle}
             <button type="button" class="trip-btn-submit" on:click={() => editToggle = true}>Stop</button>

@@ -901,7 +901,7 @@
                 <Infocard driverInfo={modalDriver} description={modalDescription} startTime={modalStart} endTime={modalEnd} dateInfo={modalDate} on:toggle={captureModalClose}/>
             {/if}
             {#if tripModal}
-                <Unfinishedmodal tripDetails={userTrips} vehicles={vehicleList} on:toggle={captureTripModalClose}/>
+                <Unfinishedmodal tripDetails={userTrips} vehicles={vehicleList} allTrips={driverTrips} on:toggle={captureTripModalClose}/>
             {/if}
         {/if}
     </div>
