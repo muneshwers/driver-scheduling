@@ -8,8 +8,11 @@
     import mllogo from "../mllogo.png";
     import arrowLeft from "../arrow-left-solid.svg";
 	import Infocard from './Infocard.svelte';
+	import Unfinishedmodal from './Unfinishedmodal.svelte';
 
     export let data;
+
+    $: loggedUserInfo = data.userInfo;
 
     //Returns JSON of eventsList for calendar and all columns
     $: updateData = async () => {
@@ -38,12 +41,22 @@
             }))
         }
     }
+
+    //Returns JSON of driver trips for validation
+    $: getDriverTrips = async () => {
+        const { data, error } = await supabase.from("trips").select();
+        if(error) return console.error(error);
+        return {
+            trips: data ?? []
+        }
+    }
+
     
     let calendarEl;
     let calendar;
     let isLoggedIn = data.access;
     let userInfo = data.userInfo;
-    let userType = userInfo.user_type
+    let userType = userInfo.user_type;
     let disabled = true;
 
     //TODO Change before deployment
@@ -63,6 +76,9 @@
     $: driversAllCols = [];
     $: eventsAllCols = [];
     $: driversActiveData = [];
+    $: driverTrips = [];
+    $: userTrips = [];
+    $: vehicleList = [];
 
 
     //Returns array of events or drivers based on toggle input
@@ -103,6 +119,13 @@
             activeDrivers.forEach(singleEvent => {
                 returnedData.push(singleEvent);
             });     
+        }
+        if (toggle == 'trips') {
+            const dbData = await getDriverTrips();
+            const unfinishedTrips = dbData.trips.filter((trip) => trip.end == null);
+            unfinishedTrips.forEach(trip => {
+                returnedData.push(trip);
+            })
         }
         return returnedData;
     }
@@ -157,6 +180,8 @@
 
     $: showModal = false;
 
+    $: tripModal = false;
+
     //Input error information
     $: errors = {
         driver : {
@@ -206,7 +231,11 @@
         driverTableData = await addDataToLocal("drivers");
         driversAllCols = await addDataToLocal("driversFull");
         driversActiveData = await addDataToLocal("driversActive");
-        
+        driverTrips = await addDataToLocal("trips");
+
+        userTrips = toggleTrips().returnedData;
+        vehicleList = toggleTrips().vehicles;
+
         Notification.requestPermission()
             .then((permission) => {
                 console.log('Notifications Permissions: ' + permission);
@@ -215,6 +244,8 @@
                 console.log('Permissions was rejected');
                 console.log(error);
             });
+        
+        
         calendar = new Calendar(calendarEl, {
             plugins: [ resourceTimelinePlugin ],
             slotDuration: '00:10:00',
@@ -325,7 +356,6 @@
                     table: 'events',
                 },
                 async (payload) => {
-                    // console.log(payload);
                     const driverInfo = driversActiveData.find((driver) => driver.id == payload.new.resourceId);
                     notification = {
                         title: driverInfo.name + ': ' + payload.new.title + ' from '+payload.new.startTime+ ' to '+payload.new.endTime,
@@ -340,7 +370,6 @@
                     eventsAllCols = await addDataToLocal("eventsFull");
                     calendar.removeAllEventSources();
                     calendar.addEventSource(eventsTableData);
-                    // console.log(notification);
                     navigator.serviceWorker.controller.postMessage(notification);
                     calendar.render();
                 }
@@ -352,7 +381,6 @@
                     table: 'drivers',
                 },
                 async (payload) => {
-                    console.log(payload);
                     driverTableData = await addDataToLocal("drivers");
                     driversAllCols = await addDataToLocal("driversFull");
                     driversActiveData = await addDataToLocal("driversActive");
@@ -405,7 +433,6 @@
     const handleCreateDriver = async (event) => {
 
         let newId = await lastDriverId()+1;
-        console.log(newId, ": New Id")
         
         let driverUpload = {
             id: newId,
@@ -491,9 +518,9 @@
         
 
         if(editDriverStatus == editDriverStatusConfirm) {
-                errors.editDriverStatus.error = true;
-                errors.editDriverStatus.message = "Driver status has not been changed";
-                return;
+            errors.editDriverStatus.error = true;
+            errors.editDriverStatus.message = "Driver status has not been changed";
+            return;
         }
 
         if(editDriverStatus == "Inactive" || editDriverStatus == "Deactive") {
@@ -547,8 +574,6 @@
         });
         let sortedIds = driverIds.sort((a, b) => a - b)
         let lastItemIndex = sortedIds.length - 1;
-        console.log(sortedIds);
-        console.log(sortedIds[lastItemIndex]);
 
         return sortedIds[lastItemIndex];
     }
@@ -607,6 +632,29 @@
          .eq('id', driverUpload.id)
          if (error) return console.error("Unable to edit driver: ", error);
          formRefresh();
+    }
+
+    const toggleTrips = () => {
+        //userTrips
+        let returnedData = [];
+        let vehicles = [];
+        if (isLoggedIn && userInfo.user_type == "driver") {
+            let userTrip = driverTrips.find((trip) => trip.driver == userInfo.display_name)
+            if (userTrip) { 
+                let userVehicle = data.vehicleList.find((vehicle) => vehicle.id == userTrip.vehicle);
+                if(userVehicle) {
+                    tripModal = true;
+                    vehicles = userVehicle;
+                }
+            }
+            returnedData = userTrip;           
+            
+        }
+        
+        return {
+            returnedData,
+            vehicles
+        };
     }
 
     //Initiates input to only allow errors if the input field was used (initiated) - Copied logic from (sort of) from petty cash
@@ -805,6 +853,10 @@
     const captureModalClose = (event) => {
         showModal = event.detail.boolean
     }
+
+    const captureTripModalClose = (event) => {
+        tripModal = event.detail.boolean
+    }
     
 
 </script>
@@ -833,9 +885,6 @@
     <a href="/workspace/newTrip">
         <button type="button" class="navigation-item">New Trip</button>
     </a>
-    <a href="/workspace/newTrip">
-        <button type="button" class="navigation-item">Edit Recent Trips</button>
-    </a>
     <a href="/workspace/trips">
         <button type="button" class="navigation-item">Trip History</button>
     </a>
@@ -850,6 +899,9 @@
             <div bind:this={calendarEl}></div>
             {#if showModal}
                 <Infocard driverInfo={modalDriver} description={modalDescription} startTime={modalStart} endTime={modalEnd} dateInfo={modalDate} on:toggle={captureModalClose}/>
+            {/if}
+            {#if tripModal}
+                <Unfinishedmodal tripDetails={userTrips} vehicles={vehicleList} on:toggle={captureTripModalClose}/>
             {/if}
         {/if}
     </div>
