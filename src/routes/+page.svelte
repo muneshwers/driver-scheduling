@@ -239,6 +239,10 @@
         Notification.requestPermission()
             .then((permission) => {
                 console.log('Notifications Permissions: ' + permission);
+                // navigator.serviceWorker.ready
+                //     .then(registration => registration.sync.register('syncTrips'))
+                //     .then(() => console.log("Registered background sync"))
+                //     .catch(err => console.error("Error registering background sync", err))
             })
             .catch((error) => {
                 console.log('Permissions was rejected');
@@ -358,8 +362,8 @@
                 async (payload) => {
                     const driverInfo = driversActiveData.find((driver) => driver.id == payload.new.resourceId);
                     notification = {
-                        title: driverInfo.name + ': ' + payload.new.title + ' from '+payload.new.startTime+ ' to '+payload.new.endTime,
-                        options: { body: 'Trip has been scheduled' },
+                        title: 'Trip has been scheduled',
+                        options: { body: payload.new.title + ' from '+payload.new.startTime+ ' to '+ payload.new.endTime + " | Driver: " + driverInfo.name },
                         data: {
                             loggedUser: userInfo.display_name,
                             driverName: driverInfo.name,

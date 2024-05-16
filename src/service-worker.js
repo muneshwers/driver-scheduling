@@ -15,3 +15,14 @@ self.addEventListener('message', (event) => {
     });
   }
 });
+
+self.addEventListener('sync', (event) => {
+  console.log("Sync event", event);
+  if (event.tag === 'syncTrips') {
+    event.waitUntil(sendTripNotif());
+  }
+})
+
+const sendTripNotif = () => {
+
+}
