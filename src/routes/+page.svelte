@@ -431,7 +431,7 @@
                     eventsAllCols = await addDataToLocal("eventsFull");
                     calendar.removeAllEventSources();
                     calendar.addEventSource(eventsTableData);
-                    navigator.serviceWorker.controller.postMessage(notification);
+                    // navigator.serviceWorker.controller.postMessage(notification);
                     calendar.render();
                 }
             ).on(       
