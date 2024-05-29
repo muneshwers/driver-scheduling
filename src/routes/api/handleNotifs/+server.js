@@ -1,9 +1,12 @@
 import webpush from 'web-push';
 import { supabase } from "$lib/supabaseClient";
-import { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY } from '$env/static/private';
+// import { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY } from '$env/static/private';
 
 export async function POST({ request }) {
     const { title, options, data } = await request.json();
+
+    const VAPID_PUBLIC_KEY = 'BA5nv-0PTU5msFULsacy7L3CRD6Bqu855CihwlenYvbEiK3gmm8rPkZrK2CrhD5CuEMcpYlYUuisdptK9H6Ft8U';
+    const VAPID_PRIVATE_KEY = 'GqTli5NVI0OpONSQcSBsAG0RPuaJ_cWJepLxya0NMOM';
 
     webpush.setVapidDetails('mailto:programmers.muneshwers@gmail.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 
