@@ -717,6 +717,22 @@
         return sortedIds[lastItemIndex];
     }
 
+    //Searches for ID of the last user
+    const lastUserId = async () => {
+        usersActiveData = await addDataToLocal("users");
+        if (usersActiveData.length < 1) {
+            return 0;
+        }
+        let userIds = [];
+        usersActiveData.forEach((user) => {
+            userIds.push(user.id);
+        });
+        let sortedIds = userIds.sort((a, b) => a - b)
+        let lastItemIndex = sortedIds.length - 1;
+
+        return sortedIds[lastItemIndex];
+    }
+
     //Checks for overlaps not related to current event
     const checkforOverlapsEdit = async (eventUpload) => {
         eventsAllCols = await addDataToLocal("eventsFull");
@@ -743,7 +759,25 @@
     const createDriver = async(driverUpload) => {
         const { error } = await supabase.from("drivers").insert([driverUpload]);
         if (error) return console.error("Unable to create driver: ", error);
+        await createDriverUser(driverUpload.name);
         formRefresh();
+    }
+
+    const createDriverUser = async(driverName) => {
+        let newId = await lastUserId()+1;
+        let firstName = driverName.split(' ').slice(0, -1).join(' ');
+        let lastName = driverName.split(' ').slice(-1).join(' ');
+        console.log("First Name: ", firstName, ". Last Name: ", lastName);
+        let newDriverUser = {
+            id: newId,
+            username: (firstName+lastName).toLowerCase(),
+            password: 'hi123',
+            user_type: 'driver',
+            display_name: driverName
+        }
+        const { error } = await supabase.from("users").insert([newDriverUser]);
+        if(error) return console.error("Unable to create driver user: ", error);
+        alert(`Driver Credentials Created! Username: ${newDriverUser.username}. Password: ${newDriverUser.password}.`);
     }
 
     //Updates DB with new edited event
