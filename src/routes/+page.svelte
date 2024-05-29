@@ -159,6 +159,8 @@
     $: description = '';
     $: driverInputConfirm = '';
     $: addDriverName = '';
+    $: addVehicleName = '';
+    $: addVehicleNumber = '';
     $: editDriverId = '';
     $: editDriverStatus = '';
     $: editDriverStatusConfirm = '';
@@ -230,6 +232,16 @@
             init: 0
         },
         addDriverName : {
+            error: false,
+            message: "",
+            init: 0
+        },
+        addVehicleName : {
+            error: false,
+            message: "",
+            init: 0
+        },
+        addVehicleNumber : {
             error: false,
             message: "",
             init: 0
@@ -593,6 +605,28 @@
         calendar.render();
     }
 
+    //Runs when user clicks on Create for Driver Settings
+    const handleCreateVehicle = async (event) => {
+
+        let newId = await lastVehicleId()+1;
+        
+        let vehicleData = {
+            id: newId,
+            name: addVehicleName,
+            number: addVehicleNumber,
+            status: "Active"
+        };
+        let existing = await checkForExistingVehicle(vehicleData);
+        if(existing) {
+            errors.addVehicleNumber.error = true;
+            errors.addVehicleNumber.message = "Vehicle already exists. Please confirm with list.";
+            return;
+        }
+        createVehicle(vehicleData);
+        // calendar.addResource(driverInfo);
+        // calendar.render();
+    }
+
     //Runs when user clicks on Update in Edit Workspace
     const handleEdit = async (event) => {
         if (fromInput.length == 5){
@@ -701,6 +735,14 @@
         return true;
     }
 
+    //Checks for existing vehicles
+    const checkForExistingVehicle = async (vehicleData) => {
+        // driversAllCols = data.vehicleList;
+        let foundExisting = data.vehicleList.find((vehicle) => vehicle.number == vehicleData.number);
+        if(!foundExisting) return false; //No overlaps or duplicates
+        return true;
+    }
+
     //Searches for ID of the last driver
     const lastDriverId = async () => {
         driversAllCols = await addDataToLocal("driversFull");
@@ -733,6 +775,21 @@
         return sortedIds[lastItemIndex];
     }
 
+    //Searches for ID of the last user
+    const lastVehicleId = async () => {
+        if (data.vehicleList.length < 1) {
+            return 0;
+        }
+        let vehicleIds = [];
+        data.vehicleList.forEach((vehicle) => {
+            vehicleIds.push(vehicle.id);
+        });
+        let sortedIds = vehicleIds.sort((a, b) => a - b)
+        let lastItemIndex = sortedIds.length - 1;
+
+        return sortedIds[lastItemIndex];
+    }
+
     //Checks for overlaps not related to current event
     const checkforOverlapsEdit = async (eventUpload) => {
         eventsAllCols = await addDataToLocal("eventsFull");
@@ -754,6 +811,19 @@
         const { error } = await supabase.from("events").insert([eventDetails]);
         if (error) return console.error("Unable to Insert: ", error);
         formRefresh();
+    }
+
+    const createVehicle = async(vehicleData) => {
+        let newVehicle = {
+            id: vehicleData.id,
+            number: vehicleData.number,
+            name: vehicleData.name,
+            status: vehicleData.status
+        }
+        const { error } = await supabase.from("vehicles").insert([newVehicle]);
+        if(error) return console.error("Unable to create new vehicle: ", error);
+        formRefresh();
+        // alert(`Driver Credentials Created! Username: ${newDriverUser.username}. Password: ${newDriverUser.password}.`);
     }
 
     const createDriver = async(driverUpload) => {
@@ -856,6 +926,12 @@
         if(field == "editDriverStatus") {
             errors.editDriverStatus.init++;
         }
+        if(field == "addVehicleName") {
+            errors.addVehicleName.init++;
+        }
+        if(field == "addVehicleNumber") {
+            errors.addVehicleNumber.init++;
+        }
     }
 
     //For edit workspace. Since inputs are already initialized.
@@ -893,6 +969,22 @@
         if (addDriverName) {
             errors.addDriverName.error = false;
             errors.addDriverName.message = "";
+        }
+        if (addVehicleName) {
+            errors.addVehicleName.error = false;
+            errors.addVehicleName.message = "";
+        }
+        if (addVehicleNumber) {
+            errors.addVehicleNumber.error = false;
+            errors.addVehicleNumber.message = "";
+        }
+        if (!addVehicleName && errors.addVehicleName.init > 0) {
+            errors.addVehicleName.error = true;
+            errors.addVehicleName.message = "Vehicle name required.";
+        }
+        if (!addVehicleNumber && errors.addVehicleNumber.init > 0) {
+            errors.addVehicleNumber.error = true;
+            errors.addVehicleNumber.message = "Vehicle number required.";
         }
         if (!addDriverName && errors.addDriverName.init > 0) {
             errors.addDriverName.error = true;
@@ -938,6 +1030,11 @@
         }
         if (!editDriverId || !editDriverStatus && section == "edit") {
             disabled = true;
+            
+        }
+        if ((!addVehicleName || !addVehicleNumber) && section == "createVehicle") {
+            disabled = true;
+            return
         }
         disabled = false;
     }
@@ -1265,6 +1362,9 @@
                 {#if settingsPage == "default"}
                     <div class="settings-home">
                         <!-- svelte-ignore a11y-invalid-attribute -->
+                        <button href="" class="settings-item poppins-medium" on:click={() => settingsPage = "addVehicle"}>
+                            Add Vehicle
+                        </button>
                         <button href="" class="settings-item poppins-medium" on:click={() => settingsPage = "addDriver"}>
                             Add Driver
                         </button>
@@ -1272,6 +1372,38 @@
                             Edit Driver
                         </button>
                     </div>
+                {:else if settingsPage == "addVehicle"}
+                    <div class="settings-page">
+                        <form action="" class="formContainer">
+                            <div class="settings-page-header">
+                                <!-- svelte-ignore a11y-invalid-attribute -->
+                                <a href="" class="back-toggle" on:click={() => settingsPage = "default"}>
+                                    <img src={arrowLeft} alt="Back to Settings Home" class="back-button" />
+                                </a>
+                                <div class="poppins-medium workspace-subtitle">Add Vehicle</div>
+                            </div>
+                            {#if errors.addVehicleName.error}
+                                <div class="error-message-label">
+                                    {errors.addVehicleName.message}
+                                </div>
+                            {/if}
+                            <div class="row">
+                                <label for="addVehicleName" class="workspace-label">Name</label>
+                                <input type="text" placeholder="Car" id="addVehicleName" bind:value={addVehicleName} class="workspace-input {errors.addVehicleName.error == true ? 'input-error' : 'default-input'}"  on:input={() => {settingsButtonToggle("createVehicle"); formValidation(); initializeInput("addVehicleName");  returnButtonState();}}/>
+                            </div>
+                             {#if errors.addVehicleNumber.error}
+                                <div class="error-message-label">
+                                    {errors.addVehicleNumber.message}
+                                </div>
+                            {/if}
+                            <div class="row">
+                                <label for="addVehicleNumber" class="workspace-label">Number</label>
+                                <input type="text" placeholder="PAA1001" id="addVehicleNumber" bind:value={addVehicleNumber} class="workspace-input {errors.addVehicleNumber.error == true ? 'input-error' : 'default-input'}"  on:input={() => {settingsButtonToggle("createVehicle"); formValidation(); initializeInput("addVehicleNumber");  returnButtonState();}}/>
+                            </div>
+
+                            <button type="button" class="{buttons.driverCreate.text == "Adding..." ? 'btn-submit-extend' : 'btn-submit'}" on:click={() => {handleCreateVehicle(); buttons.driverCreate.text = "Adding..."}} {disabled} >{buttons.driverCreate.text}</button>
+                        </form>
+                    </div>    
                 {:else if settingsPage == "addDriver"}
                     <div class="settings-page">
                         <form action="" class="formContainer">
