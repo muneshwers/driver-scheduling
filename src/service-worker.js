@@ -36,7 +36,12 @@ self.addEventListener('push', (event) => {
     self.registration.showNotification(title, {
       body: body,
       icon: icon,
-      tag: tag
+      tag: tag,
+      vibrate: [100, 50, 100],
+      priority: 'max',
+      android:{
+        priority: 'max'
+      },
     })
   );
 
