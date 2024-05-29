@@ -9,6 +9,7 @@
     import arrowLeft from "../arrow-left-solid.svg";
 	import Infocard from './Infocard.svelte';
 	import Unfinishedmodal from './Unfinishedmodal.svelte';
+    // import webpush from 'web-push'
 
     export let data;
 
@@ -51,6 +52,14 @@
         }
     }
 
+    $: getUsersData = async () => {
+        const { data, error } = await supabase.from("users").select();
+        if(error) return console.error(error);
+        return {
+            users: data ?? []
+        }
+    }
+
     
     let calendarEl;
     let calendar;
@@ -69,6 +78,10 @@
 
     $: notification = {};
 
+    //Notification Management
+    let isSubscribed = false;
+    let notifPermGranted = null;
+
 
     //Main Data Sources
     $: eventsTableData = [];
@@ -76,6 +89,7 @@
     $: driversAllCols = [];
     $: eventsAllCols = [];
     $: driversActiveData = [];
+    $: usersActiveData = [];
     $: driverTrips = [];
     $: userTrips = [];
     $: vehicleList = [];
@@ -125,6 +139,12 @@
             const unfinishedTrips = dbData.trips.filter((trip) => trip.end == null);
             unfinishedTrips.forEach(trip => {
                 returnedData.push(trip);
+            })
+        }
+        if (toggle == 'users') {
+            const dbData = await getUsersData();
+            dbData.users.forEach(user => {
+                returnedData.push(user);
             })
         }
         return returnedData;
@@ -232,22 +252,49 @@
         driversAllCols = await addDataToLocal("driversFull");
         driversActiveData = await addDataToLocal("driversActive");
         driverTrips = await addDataToLocal("trips");
+        usersActiveData = await addDataToLocal("users");
 
         userTrips = toggleTrips().returnedData;
         vehicleList = toggleTrips().vehicles;
 
-        Notification.requestPermission()
-            .then((permission) => {
-                console.log('Notifications Permissions: ' + permission);
-                // navigator.serviceWorker.ready
-                //     .then(registration => registration.sync.register('syncTrips'))
-                //     .then(() => console.log("Registered background sync"))
-                //     .catch(err => console.error("Error registering background sync", err))
-            })
-            .catch((error) => {
-                console.log('Permissions was rejected');
-                console.log(error);
-            });
+        notifPermGranted = Notification.permission === 'granted';
+
+        if (notifPermGranted) {
+            isSubscribed = await checkSubscriptionStatus();
+
+            if (!isSubscribed) {
+                await subscribeUser();
+            }
+        }
+        if(!notifPermGranted && isLoggedIn) {
+            requestNotificationPermission();
+        }
+
+        
+
+        // const sendNotification = async (subscription, payload ) => {
+        //     try {
+        //         const res = await webpush.sendNotification(subscription, payload);
+        //         return {
+        //             ok: res.statusCode === 201,
+        //             status: res.statusCode,
+        //             body: res.body
+        //         }
+        //     } catch (err) {
+        //         const msg = `Could not send notification: ${err}`;
+        //         console.error(msg);
+        //         return {
+        //             ok: false,
+        //             status: undefined,
+        //             body: msg
+        //         }
+        //     }
+        // }
+
+
+ 
+
+        
         
         
         calendar = new Calendar(calendarEl, {
@@ -361,15 +408,25 @@
                 },
                 async (payload) => {
                     const driverInfo = driversActiveData.find((driver) => driver.id == payload.new.resourceId);
+                    const driverUserInfo = usersActiveData.find((user) => user.display_name == driverInfo.name);
                     notification = {
                         title: 'Trip has been scheduled',
                         options: { body: payload.new.title + ' from '+payload.new.startTime+ ' to '+ payload.new.endTime + " | Driver: " + driverInfo.name },
                         data: {
                             loggedUser: userInfo.display_name,
                             driverName: driverInfo.name,
-                            userType: userType
+                            userType: userType,
+                            userId: driverUserInfo.id
                         }
                     }
+                    await fetch('/api/handleNotifs', {
+                        method: 'POST',
+                        body: JSON.stringify(notification),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    });
+
                     eventsTableData = await addDataToLocal("events");
                     eventsAllCols = await addDataToLocal("eventsFull");
                     calendar.removeAllEventSources();
@@ -401,6 +458,84 @@
     //     subscription.unsubscribe();
     // });
 
+    
+     //Check Subscription Status
+    const checkSubscriptionStatus = async () => {
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.getSubscription();
+            console.log('Subscription: ', subscription);
+            const exists = subscription !== null;
+            if (exists) {
+                sendSubscriptionToServer(subscription);
+            }
+            return subscription !== null;
+        }
+        return false
+    }    
+
+    //Subscribe user to push
+    const subscribeUser = async () => {
+        if('serviceWorker' in navigator) {
+            try {
+                const res = await fetch('/api/vapidPubKey');
+                const { data } = await res.json();
+
+                const registration = await navigator.serviceWorker.ready;
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: data
+                });
+                isSubscribed = true;
+                console.log('Subscription:', JSON.stringify(subscription));
+                sendSubscriptionToServer(subscription);
+            } catch (err) {
+                console.error('Error subscribing:', err);
+            }
+        }
+        
+    }
+
+    const sendSubscriptionToServer = async (subscription) => {
+        try {
+            const res = await fetch('/api/addSubscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ subscription, userId: userInfo.id })
+            });
+            if(!res.ok) throw new Error(`Error saving subscription on server: ${res.statusText} (${res.status})`);
+        } catch (error) {
+            console.error("Error saving subscription on server: ", error);
+            unsubscribe();
+        }
+    }
+
+    const unsubscribe = async () => {
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.getSubscription();
+            if (subscription) {
+                await subscription.unsubscribe();
+                isSubscribed = false;
+            }
+        }
+    }
+
+    //Request Permission from User
+    const requestNotificationPermission = () => {
+        Notification.requestPermission().then((permission) => {
+            if(permission == 'granted') {
+                new Notification('You are now subscribed to Notifications!');
+            }
+        })
+        .catch((error) => {
+            console.log('Permissions was rejected');
+            console.log(error);
+        })
+    }
+    
     //Runs when user clicks the submit button in scheduler
     const handleSubmit = async (event) => {
         
