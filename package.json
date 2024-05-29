@@ -17,6 +17,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@tailwindcss/typography": "^0.5.10",
 		"@types/eslint": "^8.56.0",
+		"@types/web-push": "^3.6.3",
 		"autoprefixer": "^10.4.16",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
@@ -41,6 +42,8 @@
 		"@fullcalendar/resource-timeline": "^6.1.11",
 		"@supabase/supabase-js": "^2.42.1",
 		"fullcalendar": "^6.1.11",
-		"uuid": "^9.0.1"
+		"safer-buffer": "^2.1.2",
+		"uuid": "^9.0.1",
+		"web-push": "^3.6.7"
 	}
 }
