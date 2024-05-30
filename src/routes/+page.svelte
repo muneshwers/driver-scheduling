@@ -1371,6 +1371,9 @@
                         <button class="settings-item poppins-medium" on:click={() => settingsPage = "editDriver"}>
                             Edit Driver
                         </button>
+                        <a href="/trips">
+                            <button class="settings-item poppins-medium">Driver Trips</button>
+                        </a>
                     </div>
                 {:else if settingsPage == "addVehicle"}
                     <div class="settings-page">
