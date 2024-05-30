@@ -789,10 +789,15 @@ input[type="date"]::-webkit-datetime-edit {
     margin-right: 5%;
 }
 
+.controls {
+    padding: 5px;
+    width: 5%;
+    margin-left: 5px;
+}
+
 .workspace-back {
     width: 20%;
     padding: 5px;
-    margin-left: 10%;
     object-fit: contain;
 }
 
@@ -819,6 +824,7 @@ input[type="date"]::-webkit-datetime-edit {
     display: flex;
     justify-content: space-between;
     margin-bottom: 1%;
+    gap: 5px;
 }
 
 .tab-selector {

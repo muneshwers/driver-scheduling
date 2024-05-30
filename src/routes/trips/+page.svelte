@@ -47,12 +47,17 @@
         return returnedData;
     }
 
+    let searchTerm = '';
+    // $: filteredTrips = [];
+
     onMount( async () => {
         vehicles = await addDataToLocal("vehicles");
         trips = await addDataToLocal("trips");
         trips = trips.sort(function(a,b){
             return new Date(b.date) - new Date(a.date);
         })
+
+        
         // const sortItems = writable(trips.slice());
         // const sortKey = writable('date');
         // const sortDirection = writable(1);
@@ -66,6 +71,8 @@
         // };
 
     })
+
+    $: filteredTrips = trips.filter((trip) => trip.date.indexOf(searchTerm) !== -1);
 
 
    
@@ -111,13 +118,17 @@
     <div class="page-subtitle poppins-medium">
         Trip History
     </div>
+    <div class="controls">
+        <a href="/" class="workspace-back">
+            <img src={arrowLeft} alt="Back to Home" class="workspace-back-button" />
+        </a>
+    </div>
     <!-- svelte-ignore a11y-invalid-attribute -->
-    <a href="/" class="workspace-back">
-        <img src={arrowLeft} alt="Back to Home" class="workspace-back-button" />
-    </a>
-    <Table hoverable={true}>
+    
+    <TableSearch placeholder="Search by Date" bind:inputValue={searchTerm} hoverable={true}>
         <TableHead>
             <TableHeadCell>Date</TableHeadCell>
+            <TableHeadCell>Driver</TableHeadCell>
             <TableHeadCell>Location</TableHeadCell>
             <TableHeadCell>Vehicle</TableHeadCell>
             <TableHeadCell>Start</TableHeadCell>
@@ -125,9 +136,10 @@
             <TableHeadCell>Odometer</TableHeadCell>
         </TableHead>
         <TableBody tableBodyClass="divide-y">
-            {#each trips as trip}
+            {#each filteredTrips as trip}
             <TableBodyRow>
                 <TableBodyCell>{trip.date}</TableBodyCell>
+                <TableBodyCell>{trip.driver}</TableBodyCell>
                 <TableBodyCell>{trip.location}</TableBodyCell>
                 <TableBodyCell>{vehicles.find((vehicle) => vehicle.id == trip.vehicle).number + " - " + vehicles.find((vehicle) => vehicle.id == trip.vehicle).name}</TableBodyCell>
                 <TableBodyCell>{trip.start}</TableBodyCell>
@@ -136,5 +148,5 @@
             </TableBodyRow>
             {/each}
         </TableBody>
-    </Table>
+    </TableSearch>
 </div>
