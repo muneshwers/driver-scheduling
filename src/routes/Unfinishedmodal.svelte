@@ -32,7 +32,7 @@
     }
 
     const checkForOverlaps = (tripData) => {
-        let foundExisting = allTrips.filter((trip) => trip.date == tripData.date && trip.start >= tripData.end);
+        let foundExisting = allTrips.find((trip) => trip.date == tripData.date && trip.start >= tripData.end);
         console.log(foundExisting);
         if(!foundExisting) return false;
         return true;
