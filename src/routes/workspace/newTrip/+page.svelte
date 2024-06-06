@@ -88,17 +88,6 @@
                 }
             }
         },
-        odometer: {
-            value: "",
-            error: false,
-            errorMessage: "",
-            init: 0,
-            initialize: function () {
-                if(this.init <= 0) {
-                    this.init++
-                }
-            }
-        },
         date: {
             value: (new Date()).toISOString().split('T')[0],
             error: false,
@@ -131,7 +120,6 @@
             vehicle: formInputs.vehicle.value,
             start: formInputs.start.value,
             end: null,
-            odometer: formInputs.odometer.value,
             date: formInputs.date.value
         };
         let overlaps = await checkforOverlaps(tripUpload);
@@ -170,10 +158,6 @@
             formInputs.location.error = false;
             formInputs.location.errorMessage = "";
         }
-        if (formInputs.odometer.value) {
-            formInputs.odometer.error = false;
-            formInputs.odometer.errorMessage = "";
-        }
         if (formInputs.start.value) {
             formInputs.start.error = false;
             formInputs.start.errorMessage = "";
@@ -190,10 +174,6 @@
             formInputs.location.error = true;
             formInputs.location.errorMessage = "Location is required";
         }
-        if (!formInputs.odometer.value && formInputs.odometer.init > 0) {
-            formInputs.odometer.error = true;
-            formInputs.odometer.errorMessage = "Odometer is required";
-        }
         if (!formInputs.start.value && formInputs.start.init > 0) {
             formInputs.start.error = true;
             formInputs.start.errorMessage = "Start time is required";
@@ -207,12 +187,10 @@
     const refreshErrors = () => {
         formInputs.date.error = false;
         formInputs.location.error = false;
-        formInputs.odometer.error = false;
         formInputs.start.error = false;
         formInputs.vehicle.error = false;
         formInputs.date.errorMessage = "";
         formInputs.location.errorMessage = "";
-        formInputs.odometer.errorMessage = "";
         formInputs.start.errorMessage = "";
         formInputs.vehicle.errorMessage = "";
     }
@@ -220,14 +198,13 @@
     const formRefresh = () => {
         formInputs.date.value = "";
         formInputs.location.value = "";
-        formInputs.odometer.value = "";
         formInputs.start.value = "";
         formInputs.vehicle.value = "";
         buttons.create.text="Create Trip";
     }
 
     const buttonToggle = () => {
-        if (!formInputs.date.value || !formInputs.location.value || !formInputs.odometer.value || !formInputs.start.value || !formInputs.vehicle.value) {
+        if (!formInputs.date.value || !formInputs.location.value || !formInputs.start.value || !formInputs.vehicle.value) {
             disabled = true;
             return
         }
@@ -292,15 +269,6 @@
         <div class="trip-row">
             <label for="" class="form-label">Start:</label>
             <input type="time" name="startTrip" bind:value={formInputs.start.value} id="startTrip" placeholder="startTrip" class="trip-form-input {formInputs.start.error == true ? 'input-error' : 'default-input'}"  on:input={() => {formValidation(); buttonToggle(); formInputs.start.initialize();}}/>
-        </div>
-        {#if formInputs.odometer.error}
-            <div class="trip-error-message-label">
-                {formInputs.odometer.errorMessage}
-            </div>
-        {/if}
-        <div class="trip-row">
-            <label for="" class="form-label">Odometer:</label>
-            <input type="text" name="odometer"  bind:value={formInputs.odometer.value} id="odometer" placeholder="0000000" class="trip-form-input {formInputs.odometer.error == true ? 'input-error' : 'default-input'}"  on:input={() => {formValidation(); buttonToggle(); formInputs.odometer.initialize();}}/>
         </div>
         {#if formInputs.date.error}
             <div class="trip-error-message-label">
